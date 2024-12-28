@@ -94,6 +94,7 @@ body::before {
     object-fit: cover;
 }
 
+/* プログレスバー */
 .progress-bar {
     width: 90%; /* 幅を90%に変更 */
     position: relative;
@@ -197,6 +198,7 @@ body::before {
     /* オプション: 色や形を調整 */
 }
 
+/* コントロールボタン */
 .controls {
     display: flex;
     justify-content: center;
@@ -252,18 +254,16 @@ body::before {
     top: 20%; /* 画像内の垂直位置 */
     left: 0%;  /* 初期の水平位置 */
     width: 20%; /* 画像サイズに対する割合 */
-    transition: left 0.1s linear; /* スムーズな移動 */
+    height: 20%; /* 高さも設定 */
+    transition: left 0.1s linear, opacity 0.5s ease, transform 0.1s linear;
+    z-index: 3; /* 画像より上に表示 */
 }
 
-.movable-part img {
+/* アニメーション用の形 */
+.animated-shape {
     width: 100%;
-    height: auto;
-}
-
-/* メディアクエリ */
-@media (hover: hover) {
-    .control-button:hover {
-        opacity: 1;
-        /* 拡大効果を削除 */
-    }
+    height: 100%;
+    background-color: #FFD700; /* ゴールド色 */
+    border-radius: 50%; /* 初期は円形 */
+    transition: border-radius 0.1s linear, background-color 0.1s linear;
 }
