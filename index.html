@@ -136,34 +136,53 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 32px;
-            margin-top: 8px;
+            gap: 48px;
+            margin-top: 32px;
         }
 
         .control-button {
             background: none;
             border: none;
-            color: #ffffff;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            opacity: 0.9;
-            transition: all 0.2s;
-        }
-
-        .play-button {
-            width: 56px;
-            height: 56px;
-            background: #ffffff;
-            border-radius: 50%;
-            color: #000000;
-            font-size: 24px;
-        }
-
-        .side-button {
-            font-size: 20px;
+            padding: 0;
             opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .control-button:hover {
+            opacity: 1;
+        }
+
+        .control-icon {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        /* サイドボタン（前へ、次へ） */
+        .side-button {
+            width: 80px; /* サイズ拡大 */
+            height: 80px;
+        }
+
+        .side-button .control-icon {
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 再生/停止ボタン */
+        .play-button {
+            width: 100px !important; /* サイズ拡大 */
+            height: 100px !important;
+        }
+
+        .play-button .control-icon {
+            width: 100% !important;
+            height: 100% !important;
+            display: block; /* 確実に表示されるように */
         }
 
         @media (hover: hover) {
@@ -199,13 +218,13 @@
 
         <div class="controls">
             <button class="control-button side-button" id="prevBtn">
-                <img src="assets/images/controls/prev.svg" alt="Previous" class="control-icon">
+                <img src="assets/images/controls/prev.png" alt="Previous" class="control-icon">
             </button>
             <button class="control-button play-button" id="playBtn">
-                <img src="assets/images/controls/play.svg" alt="Play" class="control-icon" id="playIcon">
+                <img src="assets/images/controls/play.png" alt="Play" class="control-icon" id="playIcon">
             </button>
             <button class="control-button side-button" id="nextBtn">
-                <img src="assets/images/controls/next.svg" alt="Next" class="control-icon">
+                <img src="assets/images/controls/next.png" alt="Next" class="control-icon">
             </button>
         </div>
     </div>
@@ -288,17 +307,55 @@
 
         let currentPuzzle = 0;
         let isPlaying = false;
-        let progress = 0;
-        let progressInterval;
-        let audio = new Audio('assets/audio/USAO_Climax.mp3');
+        let audio = null;
 
         const playBtn = document.getElementById('playBtn');
         const progressFill = document.getElementById('progressFill');
+        const progressHandle = document.getElementById('progressHandle');
         const currentTimeEl = document.getElementById('currentTime');
+        const totalTimeEl = document.getElementById('totalTime');
         const puzzleImage = document.querySelector('.puzzle-image');
         const puzzleOverlay = document.querySelector('.puzzle-overlay');
         const trackTitle = document.querySelector('.track-title');
         const trackArtist = document.querySelector('.track-artist');
+        const playIcon = document.getElementById('playIcon');
+
+        // DOMContentLoadedイベントで音声を初期化
+        window.addEventListener('DOMContentLoaded', () => {
+            audio = new Audio('./assets/audio/USAO_Climax.mp3');
+            audio.loop = true;
+
+            // パズルをロード
+            loadPuzzle(currentPuzzle);
+
+            // 音声のメタデータ読み込み完了時に総時間を設定
+            audio.addEventListener('loadedmetadata', () => {
+                totalTimeEl.textContent = formatTime(audio.duration);
+            });
+
+            // 音声の再生位置が更新されたときにプログレスバーを更新
+            audio.addEventListener('timeupdate', updateProgress);
+
+            // 再生終了時の処理
+            audio.addEventListener('ended', () => {
+                isPlaying = false;
+                updatePlayButton();
+                resetPuzzle();
+            });
+        });
+
+        // 再生/停止の制御関数
+        function togglePlay() {
+            if (!audio) return;
+
+            if (isPlaying) {
+                audio.pause();
+            } else {
+                audio.play().catch(error => {
+                    console.log('再生に失敗しました:', error);
+                });
+            }
+        }
 
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
@@ -307,37 +364,35 @@
         }
 
         function updateProgress() {
-            if (progress < 100) {
-                progress += (100 / (puzzles[currentPuzzle].duration * 10));
-                progressFill.style.width = `${progress}%`;
-                const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
-                currentTimeEl.textContent = formatTime(currentSeconds);
+            const currentSeconds = audio.currentTime;
+            const duration = puzzles[currentPuzzle].duration;
 
-                // 画像の変化処理
-                if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
-                    puzzleOverlay.style.opacity = "1";
-                }
+            const progressPercent = (currentSeconds / duration) * 100;
+            progressFill.style.width = `${progressPercent}%`;
+            progressHandle.style.left = `${progressPercent}%`;
+            currentTimeEl.textContent = formatTime(currentSeconds);
+
+            // 画像の変化処理
+            if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
+                puzzleOverlay.style.opacity = "1";
             } else {
-                stopProgress();
-                resetPuzzle();
+                puzzleOverlay.style.opacity = "0";
             }
         }
 
-        function startProgress() {
-            progressInterval = setInterval(updateProgress, 100);
-        }
-
-        function stopProgress() {
-            clearInterval(progressInterval);
+        function updatePlayButton() {
+            playBtn.textContent = isPlaying ? '⏸' : '▶';
+            playIcon.src = isPlaying ? 'assets/images/controls/pause.svg' : 'assets/images/controls/play.svg';
         }
 
         function resetPuzzle() {
             isPlaying = false;
-            playBtn.textContent = '▶';
-            progress = 0;
+            updatePlayButton();
             progressFill.style.width = '0%';
+            progressHandle.style.left = '0%';
             currentTimeEl.textContent = '0:00';
             puzzleOverlay.style.opacity = "0";
+            audio.currentTime = 0;
         }
 
         function loadPuzzle(index) {
@@ -346,23 +401,20 @@
             puzzleOverlay.src = puzzle.overlayImage;
             trackTitle.textContent = puzzle.title;
             trackArtist.textContent = puzzle.subtitle;
-            document.getElementById('totalTime').textContent = formatTime(puzzle.duration);
+            totalTimeEl.textContent = formatTime(puzzle.duration);
+
+            // 背景色のクラスを更新
+            const container = document.querySelector('.player-container');
+            container.className = 'player-container';  // クラスをリセット
+            container.classList.add(`stage-${puzzle.id}`);
+
             resetPuzzle();
         }
 
         playBtn.addEventListener('click', () => {
+            togglePlay();
             isPlaying = !isPlaying;
-            playBtn.textContent = isPlaying ? '⏸' : '▶';
-            
-            if (isPlaying) {
-                startProgress();
-                audio.play();
-                playIcon.src = 'assets/images/controls/pause.svg';
-            } else {
-                stopProgress();
-                audio.pause();
-                playIcon.src = 'assets/images/controls/play.svg';
-            }
+            updatePlayButton();
         });
 
         document.getElementById('nextBtn').addEventListener('click', () => {
@@ -376,69 +428,86 @@
         });
 
         // シークバーのドラッグ機能
-        const progressBar = document.querySelector('.progress-bar');
         const progressBg = document.querySelector('.progress-bar-bg');
-        const progressHandle = document.getElementById('progressHandle');
         let isDragging = false;
 
-        function updateSeekPosition(e) {
+        function seek(e) {
             const rect = progressBg.getBoundingClientRect();
             let x = e.clientX - rect.left;
             x = Math.max(0, Math.min(x, rect.width));
-            progress = (x / rect.width) * 100;
-            
-            progressFill.style.width = `${progress}%`;
-            progressHandle.style.left = `${progress}%`;
-            
-            const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
-            currentTimeEl.textContent = formatTime(currentSeconds);
-
-            if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
-                puzzleOverlay.style.opacity = "1";
-            } else {
-                puzzleOverlay.style.opacity = "0";
-            }
+            const percent = x / rect.width;
+            const seekTime = percent * puzzles[currentPuzzle].duration;
+            audio.currentTime = seekTime;
         }
 
         progressBg.addEventListener('mousedown', (e) => {
             isDragging = true;
-            progressBar.classList.add('dragging');
-            updateSeekPosition(e);
+            progressBg.classList.add('dragging');
+            seek(e);
         });
 
         document.addEventListener('mousemove', (e) => {
             if (isDragging) {
-                updateSeekPosition(e);
+                seek(e);
             }
         });
 
         document.addEventListener('mouseup', () => {
             if (isDragging) {
                 isDragging = false;
-                progressBar.classList.remove('dragging');
+                progressBg.classList.remove('dragging');
             }
         });
 
-        // プログレスバーの更新時にハンドルも更新
-        function updateProgress() {
-            if (progress < 100) {
-                progress += (100 / (puzzles[currentPuzzle].duration * 10));
-                progressFill.style.width = `${progress}%`;
-                progressHandle.style.left = `${progress}%`;
-                const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
-                currentTimeEl.textContent = formatTime(currentSeconds);
+        // タッチデバイス用のシーク
+        progressBg.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            progressBg.classList.add('dragging');
+            seek(e.touches[0]);
+        });
 
-                if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
-                    puzzleOverlay.style.opacity = "1";
-                }
-            } else {
-                stopProgress();
-                resetPuzzle();
+        progressBg.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                seek(e.touches[0]);
             }
-        }
+        });
 
-        // 初期問題の読み込み
-        loadPuzzle(currentPuzzle);
+        progressBg.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                progressBg.classList.remove('dragging');
+            }
+        });
+
+        // スワイプ機能
+        const coverArt = document.querySelector('.cover-art');
+        let startX = 0;
+        let currentX = 0;
+
+        coverArt.addEventListener('touchstart', (e) => {
+            startX = e.touches[0].clientX;
+        });
+
+        coverArt.addEventListener('touchmove', (e) => {
+            currentX = e.touches[0].clientX;
+        });
+
+        coverArt.addEventListener('touchend', () => {
+            const diffX = currentX - startX;
+            const threshold = 50; // スワイプを検知する閾値
+
+            if (Math.abs(diffX) > threshold) {
+                if (diffX > 0) {
+                    // 右スワイプ
+                    currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
+                } else {
+                    // 左スワイプ
+                    currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+                }
+                loadPuzzle(currentPuzzle);
+            }
+        });
     </script>
+
 </body>
 </html>
