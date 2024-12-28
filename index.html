@@ -99,22 +99,6 @@
             object-fit: cover;
         }
 
-        .track-info {
-            text-align: left;
-            padding: 0 4px;
-        }
-
-        .track-title {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .track-artist {
-            font-size: 16px;
-            color: #b3b3b3;
-        }
-
         .progress-bar {
             width: 90%; /* 幅を90%に変更 */
             position: relative;
@@ -171,9 +155,28 @@
             padding-top: 8px;
         }
 
-        /* シークバーのドラッグ可能なスタイル */
-        .progress-bar-bg {
-            position: relative;
+        .track-info {
+            text-align: left;
+            padding: 0 4px;
+        }
+
+        .track-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .track-artist {
+            font-size: 16px;
+            color: #b3b3b3;
+        }
+
+        /* 答え表示 */
+        .answer-info {
+            text-align: left;
+            padding: 0 4px;
+            font-size: 18px;
+            color: #00FF00; /* 仮の色（緑） */
         }
 
         /* 振動アニメーション */
@@ -204,7 +207,7 @@
             justify-content: center;
             align-items: center;
             gap: 48px;
-            margin-top: 32px;
+            margin-top: 16px; /* 少し上に移動 */
         }
 
         .control-button {
@@ -267,11 +270,6 @@
             <img class="puzzle-overlay" src="assets/images/puzzles/stage1_reveal.jpg" alt="問題画像オーバーレイ" id="puzzleOverlay">
         </div>
         
-        <div class="track-info">
-            <div class="track-title" id="trackTitle">問題 01</div>
-            <div class="track-artist" id="trackArtist">謎解きシリーズ</div>
-        </div>
-
         <div class="progress-bar">
             <div class="progress-bar-bg" id="progressBg">
                 <div class="progress-bar-fill" id="progressFill"></div>
@@ -284,6 +282,11 @@
             </div>
         </div>
 
+        <div class="track-info">
+            <div class="track-title" id="trackTitle">問題 01</div>
+            <div class="track-artist" id="trackArtist">謎解きシリーズ</div>
+        </div>
+
         <div class="controls">
             <button class="control-button side-button" id="prevBtn">
                 <img src="assets/images/controls/prev.png" alt="Previous" class="control-icon">
@@ -294,6 +297,10 @@
             <button class="control-button side-button" id="nextBtn">
                 <img src="assets/images/controls/next.png" alt="Next" class="control-icon">
             </button>
+        </div>
+
+        <div class="answer-info" id="answerInfo">
+            答え: <span id="answerText">答えがここに表示されます</span>
         </div>
     </div>
 
@@ -309,6 +316,7 @@
                 themeColor: "#E60012", // 赤
                 allowedNextTimeRanges: [{start: 1, end: 10}], // 1秒から10秒
                 solvedTime: null, // 解決時の時間を記録
+                answer: "答え1"
             },
             {
                 id: 2,
@@ -320,6 +328,7 @@
                 themeColor: "#F39800", // オレンジ
                 allowedNextTimeRanges: [{start: 10, end: 20}],
                 solvedTime: null,
+                answer: "答え2"
             },
             {
                 id: 3,
@@ -331,6 +340,7 @@
                 themeColor: "#FFF100", // 黄色
                 allowedNextTimeRanges: [{start: 20, end: 30}],
                 solvedTime: null,
+                answer: "答え3"
             },
             {
                 id: 4,
@@ -342,6 +352,7 @@
                 themeColor: "#009944", // 緑
                 allowedNextTimeRanges: [{start: 30, end: 40}],
                 solvedTime: null,
+                answer: "答え4"
             },
             {
                 id: 5,
@@ -353,6 +364,7 @@
                 themeColor: "#0068B7", // 青
                 allowedNextTimeRanges: [{start: 40, end: 50}],
                 solvedTime: null,
+                answer: "答え5"
             },
             {
                 id: 6,
@@ -364,6 +376,7 @@
                 themeColor: "#1D2088", // インディゴ
                 allowedNextTimeRanges: [{start: 50, end: 60}],
                 solvedTime: null,
+                answer: "答え6"
             },
             {
                 id: 7,
@@ -375,6 +388,7 @@
                 themeColor: "#920783", // 紫
                 allowedNextTimeRanges: [{start: 60, end: 70}],
                 solvedTime: null,
+                answer: "答え7"
             },
             {
                 id: 8,
@@ -386,6 +400,7 @@
                 themeColor: "#000000", // 黒
                 allowedNextTimeRanges: [{start: 70, end: 80}],
                 solvedTime: null,
+                answer: "答え8"
             }
         ];
 
@@ -409,9 +424,7 @@
         const progressBg = document.getElementById('progressBg');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
-
-        // フラグ管理
-        // let currentProgress = 0; // 現在までに解決した最大のパズルインデックス
+        const answerText = document.getElementById('answerText');
 
         // スワイプ用変数
         let touchStartX = 0;
@@ -561,6 +574,9 @@
             trackTitle.textContent = puzzle.title;
             trackArtist.textContent = puzzle.subtitle;
 
+            // 答えの更新
+            answerText.textContent = puzzle.answer;
+
             // 総時間の更新
             if (audio.duration) {
                 totalTimeEl.textContent = formatTime(audio.duration);
@@ -670,8 +686,8 @@
                     const allowedRanges = currentPuz.allowedNextTimeRanges;
                     const currentSeconds = audio.currentTime;
 
-                    // チェック: 現在の時間が許可された範囲内かどうか
-                    const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+                    // チェック: 現在の時間が許可された範囲内かつ再生中かどうか
+                    const canProceed = isPlaying && allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
 
                     if (canProceed && !currentPuz.solvedTime) {
                         // パズルを解決済みにする
@@ -764,8 +780,8 @@
                             const allowedRanges = currentPuz.allowedNextTimeRanges;
                             const currentSeconds = audio.currentTime;
 
-                            // チェック: 現在の時間が許可された範囲内かどうか
-                            const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+                            // チェック: 現在の時間が許可された範囲内かつ再生中かどうか
+                            const canProceed = isPlaying && allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
 
                             if (canProceed && !currentPuz.solvedTime) {
                                 // パズルを解決済みにする
