@@ -1,3 +1,4 @@
+
 // assets/js/script.js
 
 // パズルデータ配列
@@ -14,7 +15,7 @@ const puzzles = [
         solvedTime: null, // 解決時の時間を記録
         answer: "答え1",
         movableScript: "assets/js/puzzles/puzzle1.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle1/movable.png" // 動く要素の画像パス
+        movableElementSrc: "" // 今回は使用しないため空にする
     },
     {
         id: 2,
@@ -27,8 +28,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 10, end: 20}],
         solvedTime: null,
         answer: "答え2",
-        movableScript: "assets/js/puzzles/puzzle2.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle2/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle2.js",
+        movableElementSrc: ""
     },
     {
         id: 3,
@@ -41,8 +42,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 20, end: 30}],
         solvedTime: null,
         answer: "答え3",
-        movableScript: "assets/js/puzzles/puzzle3.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle3/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle3.js",
+        movableElementSrc: ""
     },
     {
         id: 4,
@@ -55,8 +56,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 30, end: 40}],
         solvedTime: null,
         answer: "答え4",
-        movableScript: "assets/js/puzzles/puzzle4.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle4/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle4.js",
+        movableElementSrc: ""
     },
     {
         id: 5,
@@ -69,8 +70,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 40, end: 50}],
         solvedTime: null,
         answer: "答え5",
-        movableScript: "assets/js/puzzles/puzzle1.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle1/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle5.js",
+        movableElementSrc: ""
     },
     {
         id: 6,
@@ -83,8 +84,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 50, end: 60}],
         solvedTime: null,
         answer: "答え6",
-        movableScript: "assets/js/puzzles/puzzle1.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle1/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle6.js",
+        movableElementSrc: ""
     },
     {
         id: 7,
@@ -97,8 +98,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 60, end: 70}],
         solvedTime: null,
         answer: "答え7",
-        movableScript: "assets/js/puzzles/puzzle1.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle1/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle7.js",
+        movableElementSrc: ""
     },
     {
         id: 8,
@@ -111,8 +112,8 @@ const puzzles = [
         allowedNextTimeRanges: [{start: 70, end: 80}],
         solvedTime: null,
         answer: "答え8",
-        movableScript: "assets/js/puzzles/puzzle1.js", // パズル用スクリプトのパス
-        movableElementSrc: "assets/images/puzzles/movable_elements/puzzle1/movable.png" // 動く要素の画像パス
+        movableScript: "assets/js/puzzles/puzzle8.js",
+        movableElementSrc: ""
     }
 ];
 

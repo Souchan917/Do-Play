@@ -4,31 +4,44 @@ function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex) {
     // アニメーション対象の要素を取得
     const animatedShape = document.getElementById('animatedShape');
 
-    // 変形を開始する時間と終了する時間（再生全体に合わせる）
-    const startTime = 0; // 開始時点
-    const endTime = puzzles[currentPuzzleIndex].revealTime; // revealTimeに設定された時間
+    // CSSを動的に挿入
+    const style = document.createElement('style');
+    style.textContent = `
+        /* アニメーション用のスタイル */
+        #animatedShape {
+            width: 100%;
+            height: 100%;
+            background-color: #000000; /* 黒色 */
+            border-radius: 0%; /* 四角形 */
+            transition: transform 0.1s linear;
+            /* その他のスタイルが必要ならここに追加 */
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 初期状態を設定
+    animatedShape.style.transform = 'rotate(0deg)';
 
     // アニメーションを更新する関数
-    function updateShape() {
+    function updateRotation() {
         const currentSeconds = audio.currentTime;
+        const duration = audio.duration;
+        if (!duration) return;
+        const progress = currentSeconds / duration; // 0から1の範囲
+        const rotationDegrees = progress * 360; // 0から360度
 
-        // 進行度を計算（0から1の範囲）
-        let progress = (currentSeconds - startTime) / (endTime - startTime);
-        progress = Math.min(Math.max(progress, 0), 1); // 0未満や1より大きい値を制限
-
-        // border-radiusを変更（50%が円形、0%が四角形）
-        animatedShape.style.borderRadius = `${50 * (1 - progress)}%`;
-
-        // 背景色の変化（オプション）
-        // 例: 円形から四角形に変化する際に色も変える場合
-        // animatedShape.style.backgroundColor = `hsl(${120 * progress}, 100%, 50%)`;
+        // 回転を適用
+        animatedShape.style.transform = `rotate(${rotationDegrees}deg)`;
     }
 
-    // audioのtimeupdateイベントにリスナーを追加
-    audio.addEventListener('timeupdate', updateShape);
+    // 音声の再生時間に応じて回転を更新
+    audio.addEventListener('timeupdate', updateRotation);
 
-    // アニメーションの最終状態を設定
+    // 音声が終了したら最終位置に設定
     audio.addEventListener('ended', () => {
-        animatedShape.style.borderRadius = '0%'; // 完全な四角形
+        animatedShape.style.transform = 'rotate(360deg)';
     });
+
+    // クリーンアップ: スクリプトが削除される際にイベントリスナーを解除
+    // ※ これはベーススクリプトで行うか、ポリフィルが必要
 }
