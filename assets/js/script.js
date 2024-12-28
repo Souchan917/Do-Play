@@ -117,6 +117,7 @@ const puzzles = [
     }
 ];
 
+
 // 現在のパズルインデックス
 let currentPuzzle = 0;
 let currentProgress = 0; // これまでに解決した最大のパズルインデックス
@@ -363,9 +364,9 @@ function loadPuzzle(index, direction = 'none') {
 function resetMovablePart(puzzle) {
     // movable-part内のアニメーション用要素をリセット
     const animatedShape = document.getElementById('animatedShape');
-    animatedShape.style.borderRadius = '50%'; // 初期は円形
-    animatedShape.style.backgroundColor = '#FFD700'; // 初期色（ゴールド）
-    animatedShape.style.transform = 'none'; // 初期変形なし
+    if (animatedShape) {
+        animatedShape.style.transform = 'rotate(0deg)'; // 初期回転位置にリセット
+    }
 
     // 現在ロードされているパズル用スクリプトを解除
     if (currentMovableScript) {

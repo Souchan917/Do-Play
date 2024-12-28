@@ -14,7 +14,7 @@ function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex) {
             background-color: #000000; /* 黒色 */
             border-radius: 0%; /* 四角形 */
             transition: transform 0.1s linear;
-            transform-origin: center center; /* 回転の中心を中央に設定 */
+            /* その他のスタイルが必要ならここに追加 */
         }
     `;
     document.head.appendChild(style);
@@ -43,5 +43,5 @@ function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex) {
     });
 
     // クリーンアップ: スクリプトが削除される際にイベントリスナーを解除
-    // ※ 現在の実装では行っていませんが、必要に応じて追加してください。
+    // ※ これはベーススクリプトで行うか、ポリフィルが必要
 }
