@@ -1,0 +1,269 @@
+/* styles.css */
+
+/* リセットCSS */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--theme-color, #000000); /* テーマカラーを背景に設定 */
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden; /* スクロール禁止 */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* 全画面表示のためのスタイル */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+}
+
+/* 背景オーバーレイ */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
+    z-index: -1;
+    transition: background-color 0.5s ease;
+}
+
+/* プレイヤーコンテナ */
+.player-container {
+    position: relative;
+    width: 90%; /* 幅を90%に変更 */
+    max-width: 400px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    transition: background-color 0.5s ease;
+    overflow: hidden;
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.9); /* 背景の明るさを下げる（黒寄りに） */
+}
+
+/* 画像コンテナ */
+.cover-art-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 1 / 1; /* 正方形 */
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+/* 画像ラッパー */
+.cover-art-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* 現在の画像と次の画像 */
+.cover-art {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    top: 0;
+    left: 0;
+    transition: transform 0.5s ease;
+}
+
+/* オーバーレイ画像 */
+.puzzle-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.5s;
+    object-fit: cover;
+}
+
+.progress-bar {
+    width: 90%; /* 幅を90%に変更 */
+    position: relative;
+    padding: 4px 0;
+    margin: 10px auto; /* 中央揃え */
+}
+
+.progress-bar-bg {
+    width: 100%;
+    height: 4px;
+    background: #4f4f4f;
+    border-radius: 2px;
+    cursor: pointer;
+    position: relative;
+}
+
+.progress-bar-fill {
+    width: 0%;
+    height: 100%;
+    background: #ffffff;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: width 0.1s linear;
+}
+
+.progress-handle {
+    width: 12px;
+    height: 12px;
+    background: #ffffff;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    left: 0%;
+    transition: all 0.1s ease;
+    z-index: 2;
+}
+
+.progress-bar-bg:hover .progress-handle {
+    transform: translate(-50%, -50%) scale(1.2);
+}
+
+.progress-bar.dragging .progress-handle {
+    transform: translate(-50%, -50%) scale(1.4);
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+.progress-time {
+    display: flex;
+    justify-content: space-between;
+    color: #b3b3b3;
+    font-size: 12px;
+    padding-top: 8px;
+}
+
+.track-info {
+    text-align: left;
+    padding: 0 4px;
+}
+
+.track-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.track-artist {
+    font-size: 16px;
+    color: #b3b3b3;
+}
+
+/* 答え表示 */
+.answer-info {
+    text-align: left;
+    padding: 0 4px;
+    font-size: 18px;
+    color: #00FF00; /* 仮の色（緑） */
+}
+
+/* 振動アニメーション */
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+
+.shake {
+    animation: shake 0.5s;
+}
+
+/* マーカーのスタイル */
+.marker {
+    position: absolute;
+    top: -4px;
+    width: 2px;
+    height: 12px;
+    background: #FF0000; /* 初期色は赤 */
+    /* オプション: 色や形を調整 */
+}
+
+.controls {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 48px;
+    margin-top: 16px; /* 少し上に移動 */
+}
+
+.control-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.control-button:hover {
+    opacity: 1;
+    /* 拡大効果を削除 */
+}
+
+.control-icon {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+/* サイドボタン（前へ、次へ） */
+.side-button {
+    width: 80px; /* サイズ拡大 */
+    height: 80px;
+}
+
+/* 再生/停止ボタン */
+.play-button {
+    width: 100px !important; /* サイズ拡大 */
+    height: 100px !important;
+}
+
+.play-button .control-icon {
+    width: 100% !important;
+    height: 100% !important;
+    display: block; /* 確実に表示されるように */
+}
+
+/* 動かす部分のスタイル */
+.movable-part {
+    position: absolute;
+    top: 20%; /* 画像内の垂直位置 */
+    left: 0%;  /* 初期の水平位置 */
+    width: 20%; /* 画像サイズに対する割合 */
+    transition: left 0.1s linear; /* スムーズな移動 */
+}
+
+.movable-part img {
+    width: 100%;
+    height: auto;
+}
+
+/* メディアクエリ */
+@media (hover: hover) {
+    .control-button:hover {
+        opacity: 1;
+        /* 拡大効果を削除 */
+    }
+}
