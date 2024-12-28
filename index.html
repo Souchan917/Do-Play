@@ -696,10 +696,11 @@
                 currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
                 loadPuzzle(currentPuzzle, 'right');
             } else if (currentPuzzle === 0 && currentProgress > 0) {
-                currentPuzzle = puzzles.length - 1;
-                loadPuzzle(currentPuzzle, 'right');
+                // 1問目で戻るボタンを押しても8問目には移動できない
+                // 何もしないか、必要に応じてアラートを表示
+                // ここでは何もしない
             } else if (currentPuzzle < currentProgress) {
-                // すでに解決済みのパズルに対してはタイミングを無視して前へ移動
+                // 解決済みのパズルに対してはタイミングを無視して前へ移動
                 currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
                 loadPuzzle(currentPuzzle, 'right');
             } else {
