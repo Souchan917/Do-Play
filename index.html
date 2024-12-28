@@ -35,7 +35,7 @@
         /* プレイヤーコンテナ */
         .player-container {
             position: relative;
-            width: 100%;
+            width: 90%; /* 幅を90%に変更 */
             max-width: 400px;
             padding: 20px;
             display: flex;
@@ -43,6 +43,22 @@
             gap: 20px;
             transition: background-color 0.5s ease;
             overflow: hidden;
+            border-radius: 10px;
+            background: rgba(0, 0, 0, 0.7); /* 背景の明るさを下げる（黒寄りに） */
+        }
+
+        /* 背景オーバーレイ */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: var(--theme-color, #000000);
+            opacity: 0.5; /* 不透明度を上げて黒寄りに */
+            z-index: -1;
+            transition: background-color 0.5s ease;
         }
 
         /* 画像コンテナ */
@@ -101,10 +117,10 @@
         }
 
         .progress-bar {
-            width: 100%;
+            width: 90%; /* 幅を90%に変更 */
             position: relative;
             padding: 4px 0;
-            margin: 10px 0;
+            margin: 10px auto; /* 中央揃え */
         }
 
         .progress-bar-bg {
@@ -156,6 +172,34 @@
             padding-top: 8px;
         }
 
+        /* シークバーのドラッグ可能なスタイル */
+        .progress-bar-bg {
+            position: relative;
+        }
+
+        /* 振動アニメーション */
+        @keyframes shake {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+            100% { transform: translateX(0); }
+        }
+
+        .shake {
+            animation: shake 0.5s;
+        }
+
+        /* マーカーのスタイル */
+        .marker {
+            position: absolute;
+            top: -4px;
+            width: 2px;
+            height: 12px;
+            background: #FF0000; /* 初期色は赤 */
+            /* オプション: 色や形を調整 */
+        }
+
         .controls {
             display: flex;
             justify-content: center;
@@ -178,7 +222,7 @@
 
         .control-button:hover {
             opacity: 1;
-            /* transform: scale(1.1); 拡大効果を削除 */
+            /* 拡大効果を削除 */
         }
 
         .control-icon {
@@ -205,53 +249,16 @@
             display: block; /* 確実に表示されるように */
         }
 
-        /* フルスクリーンボタン */
-        .fullscreen-button {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0.7;
-            transition: opacity 0.2s;
-            z-index: 10;
-        }
-
-        .fullscreen-button:hover {
-            opacity: 1;
-        }
-
-        .fullscreen-icon {
-            width: 20px;
-            height: 20px;
-            fill: #ffffff;
-        }
-
         /* メディアクエリ */
         @media (hover: hover) {
             .control-button:hover {
                 opacity: 1;
-                /* transform: scale(1.1); 拡大効果を削除 */
+                /* 拡大効果を削除 */
             }
         }
     </style>
 </head>
 <body>
-    <!-- フルスクリーンボタン -->
-    <button class="fullscreen-button" id="fullscreenBtn" title="全画面表示">
-        <!-- SVGアイコンを使用 -->
-        <svg class="fullscreen-icon" viewBox="0 0 24 24">
-            <path d="M7 14H5v5h5v-2H7v-3zm0-4h2V7h3V5H7v5zm10 4h-2v3h-3v2h5v-5zm-2-10v3h3v2h2V5h-5z"/>
-        </svg>
-    </button>
-
     <div class="player-container" id="playerContainer">
         <div class="cover-art-container">
             <div class="cover-art-wrapper">
@@ -270,6 +277,7 @@
             <div class="progress-bar-bg" id="progressBg">
                 <div class="progress-bar-fill" id="progressFill"></div>
                 <div class="progress-handle" id="progressHandle"></div>
+                <!-- マーカーがここに追加されます -->
             </div>
             <div class="progress-time">
                 <span id="currentTime">0:00</span>
@@ -298,9 +306,10 @@
                 subtitle: "Start",
                 baseImage: "assets/images/puzzles/stage1.jpg",
                 overlayImage: "assets/images/puzzles/stage1_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#FF0000" // 赤
+                revealTime: 80, // 実際の再生時間に応じて調整
+                themeColor: "#FF0000", // 赤
+                allowedNextTimeRanges: [{start: 1, end: 10}], // 1秒から10秒
+                solvedTime: null, // 解決時の時間を記録
             },
             {
                 id: 2,
@@ -308,9 +317,10 @@
                 subtitle: "Deep",
                 baseImage: "assets/images/puzzles/stage2.jpg",
                 overlayImage: "assets/images/puzzles/stage2_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#FFA500" // オレンジ
+                revealTime: 80,
+                themeColor: "#FFA500", // オレンジ
+                allowedNextTimeRanges: [{start: 10, end: 20}],
+                solvedTime: null,
             },
             {
                 id: 3,
@@ -318,9 +328,10 @@
                 subtitle: "Dive",
                 baseImage: "assets/images/puzzles/stage3.jpg",
                 overlayImage: "assets/images/puzzles/stage3_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#FFFF00" // 黄色
+                revealTime: 80,
+                themeColor: "#FFFF00", // 黄色
+                allowedNextTimeRanges: [{start: 20, end: 30}],
+                solvedTime: null,
             },
             {
                 id: 4,
@@ -328,9 +339,10 @@
                 subtitle: "Dark",
                 baseImage: "assets/images/puzzles/stage4.jpg",
                 overlayImage: "assets/images/puzzles/stage4_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#008000" // 緑
+                revealTime: 80,
+                themeColor: "#008000", // 緑
+                allowedNextTimeRanges: [{start: 30, end: 40}],
+                solvedTime: null,
             },
             {
                 id: 5,
@@ -338,9 +350,10 @@
                 subtitle: "Light",
                 baseImage: "assets/images/puzzles/stage5.jpg",
                 overlayImage: "assets/images/puzzles/stage5_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#0000FF" // 青
+                revealTime: 80,
+                themeColor: "#0000FF", // 青
+                allowedNextTimeRanges: [{start: 40, end: 50}],
+                solvedTime: null,
             },
             {
                 id: 6,
@@ -348,9 +361,10 @@
                 subtitle: "Rise",
                 baseImage: "assets/images/puzzles/stage6.jpg",
                 overlayImage: "assets/images/puzzles/stage6_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#4B0082" // インディゴ
+                revealTime: 80,
+                themeColor: "#4B0082", // インディゴ
+                allowedNextTimeRanges: [{start: 50, end: 60}],
+                solvedTime: null,
             },
             {
                 id: 7,
@@ -358,9 +372,10 @@
                 subtitle: "Fall",
                 baseImage: "assets/images/puzzles/stage7.jpg",
                 overlayImage: "assets/images/puzzles/stage7_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#EE82EE" // 紫
+                revealTime: 80,
+                themeColor: "#EE82EE", // 紫
+                allowedNextTimeRanges: [{start: 60, end: 70}],
+                solvedTime: null,
             },
             {
                 id: 8,
@@ -368,9 +383,10 @@
                 subtitle: "End",
                 baseImage: "assets/images/puzzles/stage8.jpg",
                 overlayImage: "assets/images/puzzles/stage8_reveal.jpg",
-                revealTime: 90,
-                duration: 180,
-                themeColor: "#000000" // 黒
+                revealTime: 80,
+                themeColor: "#000000", // 黒
+                allowedNextTimeRanges: [{start: 70, end: 80}],
+                solvedTime: null,
             }
         ];
 
@@ -390,11 +406,12 @@
         const trackTitle = document.getElementById('trackTitle');
         const trackArtist = document.getElementById('trackArtist');
         const playerContainer = document.getElementById('playerContainer');
-        const coverArt = document.getElementById('coverArt');
         const progressBg = document.getElementById('progressBg');
         const prevBtn = document.getElementById('prevBtn');
         const nextBtn = document.getElementById('nextBtn');
-        const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+        // フラグ管理
+        let currentProgress = 0; // 現在までに解決した最大のパズルインデックス
 
         // スワイプ用変数
         let touchStartX = 0;
@@ -403,7 +420,7 @@
         // DOMContentLoadedイベントで音声を初期化
         window.addEventListener('DOMContentLoaded', () => {
             audio = new Audio('assets/audio/USAO_Climax.mp3');
-            audio.loop = true;
+            audio.loop = false; // looping false
 
             // パズルをロード
             loadPuzzle(currentPuzzle, 'none');
@@ -422,6 +439,17 @@
                 updatePlayButton();
                 resetProgress();
             });
+
+            // 音声再生/停止時のフラグ更新
+            audio.addEventListener('play', () => {
+                isPlaying = true;
+                updatePlayButton();
+            });
+
+            audio.addEventListener('pause', () => {
+                isPlaying = false;
+                updatePlayButton();
+            });
         });
 
         // 再生/停止の制御関数
@@ -437,15 +465,19 @@
             }
         }
 
+        // 時間をフォーマットする関数
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
             const secs = Math.floor(seconds % 60);
             return `${mins}:${secs.toString().padStart(2, '0')}`;
         }
 
+        // プログレスバーを更新する関数
         function updateProgress() {
+            if (!audio.duration) return; // durationが取得できていない場合は処理を中断
+
             const currentSeconds = audio.currentTime;
-            const duration = puzzles[currentPuzzle].duration;
+            const duration = audio.duration;
 
             const progressPercent = (currentSeconds / duration) * 100;
             progressFill.style.width = `${progressPercent}%`;
@@ -458,65 +490,101 @@
             } else {
                 puzzleOverlay.style.opacity = "0";
             }
-
-            // パズルの進行状況に応じてオーディオを制御
-            if (currentSeconds >= duration) {
-                togglePlay();
-            }
         }
 
-        function updatePlayButton() {
-            if (isPlaying) {
-                playIcon.src = 'assets/images/controls/pause.png';
-                playIcon.alt = 'Pause';
+        // プログレスバーをクリックまたはタッチしたときにシークする
+        function seek(e) {
+            const rect = progressBg.getBoundingClientRect();
+            let x;
+            if (e.type.startsWith('touch')) {
+                x = e.touches[0].clientX - rect.left;
             } else {
-                playIcon.src = 'assets/images/controls/play.png';
-                playIcon.alt = 'Play';
+                x = e.clientX - rect.left;
             }
+            x = Math.max(0, Math.min(x, rect.width));
+            const percent = x / rect.width;
+            const seekTime = percent * audio.duration;
+            audio.currentTime = seekTime;
         }
 
-        function resetProgress() {
-            progressFill.style.width = '0%';
-            progressHandle.style.left = '0%';
-            currentTimeEl.textContent = '0:00';
-            puzzleOverlay.style.opacity = "0";
-        }
+        progressBg.addEventListener('mousedown', (e) => {
+            seek(e);
+            isDragging = true;
+            progressBg.classList.add('dragging');
+        });
 
-        function resetPuzzle() {
-            isPlaying = false;
-            updatePlayButton();
-            resetProgress();
-            audio.currentTime = 0;
-        }
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                seek(e);
+            }
+        });
 
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                progressBg.classList.remove('dragging');
+            }
+        });
+
+        // タッチデバイス用のシーク
+        progressBg.addEventListener('touchstart', (e) => {
+            seek(e);
+            isDragging = true;
+            progressBg.classList.add('dragging');
+        });
+
+        progressBg.addEventListener('touchmove', (e) => {
+            if (isDragging) {
+                seek(e);
+            }
+        });
+
+        progressBg.addEventListener('touchend', () => {
+            if (isDragging) {
+                isDragging = false;
+                progressBg.classList.remove('dragging');
+            }
+        });
+
+        // プログレスバーのドラッグ状態
+        let isDragging = false;
+
+        // プレイヤーコンテナをロードする関数
         function loadPuzzle(index, direction = 'none') {
             const puzzle = puzzles[index];
 
             // テーマカラーの適用
             playerContainer.style.backgroundColor = puzzle.themeColor;
+            updateBackgroundColor(puzzle.themeColor);
 
             // トラック情報の更新
             trackTitle.textContent = puzzle.title;
             trackArtist.textContent = puzzle.subtitle;
 
             // 総時間の更新
-            totalTimeEl.textContent = formatTime(puzzle.duration);
+            if (audio.duration) {
+                totalTimeEl.textContent = formatTime(audio.duration);
+            }
 
             // 画像のスライドトランジション
             if (direction !== 'none') {
                 if (direction === 'left') {
                     // 次へ: 次の画像を右からスライドイン
+                    nextImage.style.transition = 'transform 0.5s ease';
                     nextImage.style.transform = 'translateX(100%)';
                     nextImage.src = puzzle.baseImage;
-                    nextImage.style.transition = 'transform 0.5s ease';
+                    // Trigger reflow to ensure transition
+                    void nextImage.offsetWidth;
                     nextImage.style.transform = 'translateX(0)';
                     currentImage.style.transition = 'transform 0.5s ease';
                     currentImage.style.transform = 'translateX(-100%)';
                 } else if (direction === 'right') {
                     // 前へ: 前の画像を左からスライドイン
+                    nextImage.style.transition = 'transform 0.5s ease';
                     nextImage.style.transform = 'translateX(-100%)';
                     nextImage.src = puzzle.baseImage;
-                    nextImage.style.transition = 'transform 0.5s ease';
+                    // Trigger reflow to ensure transition
+                    void nextImage.offsetWidth;
                     nextImage.style.transform = 'translateX(0)';
                     currentImage.style.transition = 'transform 0.5s ease';
                     currentImage.style.transform = 'translateX(100%)';
@@ -538,83 +606,117 @@
             // オーバーレイ画像の更新
             puzzleOverlay.src = puzzle.overlayImage;
 
-            resetPuzzle();
+            // シークバーに既存のマーカーをレンダリング
+            renderMarkers();
+        }
+
+        // パズルをリセットする関数
+        function resetPuzzle() {
+            resetProgress();
+            // 音楽の再生位置や再生状態をリセットしない
         }
 
         // 再生ボタンのクリックイベント
         playBtn.addEventListener('click', () => {
             togglePlay();
-            isPlaying = !isPlaying;
-            updatePlayButton();
         });
+
+        // 再生ボタンの状態を更新する関数
+        function updatePlayButton() {
+            if (isPlaying) {
+                playIcon.src = "assets/images/controls/pause.png"; // 再生中は一時停止アイコンに変更
+                playIcon.alt = "Pause";
+            } else {
+                playIcon.src = "assets/images/controls/play.png"; // 停止中は再生アイコンに変更
+                playIcon.alt = "Play";
+            }
+        }
+
+        // シークバーにマーカーを追加する関数
+        function addMarker(time, color) {
+            if (!audio.duration) return;
+            const progressPercent = (time / audio.duration) * 100;
+            const marker = document.createElement('div');
+            marker.classList.add('marker');
+            marker.style.left = `${progressPercent}%`;
+            marker.style.background = color; // パズルのテーマカラーを適用
+            progressBg.appendChild(marker);
+        }
+
+        // シークバーに既存のマーカーを表示する関数
+        function renderMarkers() {
+            // 既存のマーカーを削除
+            const existingMarkers = document.querySelectorAll('.marker');
+            existingMarkers.forEach(marker => marker.remove());
+
+            // 新しいマーカーを追加
+            puzzles.forEach(puzzle => {
+                if (puzzle.solvedTime !== null) {
+                    addMarker(puzzle.solvedTime, puzzle.themeColor);
+                }
+            });
+        }
 
         // 次へボタンのクリックイベント
         nextBtn.addEventListener('click', () => {
-            currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-            loadPuzzle(currentPuzzle, 'left');
+            const puzzle = puzzles[currentPuzzle];
+            const allowedRanges = puzzle.allowedNextTimeRanges;
+            const currentSeconds = audio.currentTime;
+
+            // チェック: 現在の時間が許可された範囲内かどうか
+            const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+
+            if (currentPuzzle < currentProgress) {
+                // すでに解決済みのパズルに対してはタイミングを無視して次へ移動
+                currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+                loadPuzzle(currentPuzzle, 'left');
+            } else if (canProceed && !puzzles[currentPuzzle].solvedTime) {
+                // パズルを解決済みにする
+                puzzles[currentPuzzle].solvedTime = currentSeconds;
+                addMarker(currentSeconds, puzzles[currentPuzzle].themeColor);
+                currentProgress = Math.max(currentProgress, currentPuzzle + 1);
+
+                // 次のパズルに移動
+                currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+                loadPuzzle(currentPuzzle, 'left');
+            } else if (!canProceed && !puzzles[currentPuzzle].solvedTime) {
+                // 振動アニメーションを追加
+                nextBtn.classList.add('shake');
+                // アニメーションが終了したらクラスを削除
+                nextBtn.addEventListener('animationend', () => {
+                    nextBtn.classList.remove('shake');
+                }, { once: true });
+            }
+            // すでに解決済みの場合は何もしない
         });
 
         // 前へボタンのクリックイベント
         prevBtn.addEventListener('click', () => {
-            currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
-            loadPuzzle(currentPuzzle, 'right');
-        });
-
-        // シークバーのドラッグ機能
-        function seek(e) {
-            const rect = progressBg.getBoundingClientRect();
-            let x = e.clientX - rect.left;
-            x = Math.max(0, Math.min(x, rect.width));
-            const percent = x / rect.width;
-            const seekTime = percent * puzzles[currentPuzzle].duration;
-            audio.currentTime = seekTime;
-        }
-
-        progressBg.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            progressBg.classList.add('dragging');
-            seek(e);
-        });
-
-        document.addEventListener('mousemove', (e) => {
-            if (isDragging) {
-                seek(e);
-            }
-        });
-
-        document.addEventListener('mouseup', () => {
-            if (isDragging) {
-                isDragging = false;
-                progressBg.classList.remove('dragging');
-            }
-        });
-
-        // タッチデバイス用のシーク
-        progressBg.addEventListener('touchstart', (e) => {
-            isDragging = true;
-            progressBg.classList.add('dragging');
-            seek(e.touches[0]);
-        });
-
-        progressBg.addEventListener('touchmove', (e) => {
-            if (isDragging) {
-                seek(e.touches[0]);
-            }
-        });
-
-        progressBg.addEventListener('touchend', () => {
-            if (isDragging) {
-                isDragging = false;
-                progressBg.classList.remove('dragging');
+            if (currentPuzzle > 0 && currentPuzzle < currentProgress) {
+                currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
+                loadPuzzle(currentPuzzle, 'right');
+            } else if (currentPuzzle === 0 && currentProgress > 0) {
+                currentPuzzle = puzzles.length - 1;
+                loadPuzzle(currentPuzzle, 'right');
+            } else if (currentPuzzle < currentProgress) {
+                // すでに解決済みのパズルに対してはタイミングを無視して前へ移動
+                currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
+                loadPuzzle(currentPuzzle, 'right');
+            } else {
+                // 前のパズルに戻れない場合は振動
+                prevBtn.classList.add('shake');
+                prevBtn.addEventListener('animationend', () => {
+                    prevBtn.classList.remove('shake');
+                }, { once: true });
             }
         });
 
         // スワイプ機能
-        coverArt.addEventListener('touchstart', (e) => {
+        currentImage.addEventListener('touchstart', (e) => {
             touchStartX = e.changedTouches[0].clientX;
         });
 
-        coverArt.addEventListener('touchend', (e) => {
+        currentImage.addEventListener('touchend', (e) => {
             touchEndX = e.changedTouches[0].clientX;
             handleGesture();
         });
@@ -626,31 +728,74 @@
             if (Math.abs(diffX) > threshold) {
                 if (diffX > 0) {
                     // 右スワイプ
-                    currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
-                    loadPuzzle(currentPuzzle, 'right');
+                    if (currentPuzzle > 0 && currentPuzzle < currentProgress) {
+                        currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
+                        loadPuzzle(currentPuzzle, 'right');
+                    } else {
+                        // 前のパズルに戻れない場合は振動
+                        prevBtn.classList.add('shake');
+                        prevBtn.addEventListener('animationend', () => {
+                            prevBtn.classList.remove('shake');
+                        }, { once: true });
+                    }
                 } else {
                     // 左スワイプ
-                    currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-                    loadPuzzle(currentPuzzle, 'left');
+                    const puzzle = puzzles[currentPuzzle];
+                    const allowedRanges = puzzle.allowedNextTimeRanges;
+                    const currentSeconds = audio.currentTime;
+
+                    const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+
+                    if (currentPuzzle < currentProgress) {
+                        // すでに解決済みのパズルに対してはタイミングを無視して次へ移動
+                        currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+                        loadPuzzle(currentPuzzle, 'left');
+                    } else if (canProceed && !puzzles[currentPuzzle].solvedTime) {
+                        // パズルを解決済みにする
+                        puzzles[currentPuzzle].solvedTime = currentSeconds;
+                        addMarker(currentSeconds, puzzles[currentPuzzle].themeColor);
+                        currentProgress = Math.max(currentProgress, currentPuzzle + 1);
+
+                        // 次のパズルに移動
+                        currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+                        loadPuzzle(currentPuzzle, 'left');
+                    } else if (!canProceed && !puzzles[currentPuzzle].solvedTime) {
+                        // 振動アニメーションを追加
+                        nextBtn.classList.add('shake');
+                        // アニメーションが終了したらクラスを削除
+                        nextBtn.addEventListener('animationend', () => {
+                            nextBtn.classList.remove('shake');
+                        }, { once: true });
+                    }
                 }
             }
         }
 
-        // フルスクリーン機能
-        fullscreenBtn.addEventListener('click', () => {
-            if (!document.fullscreenElement) {
-                document.documentElement.requestFullscreen().catch(err => {
-                    console.log(`全画面表示に失敗しました: ${err.message} (${err.name})`);
-                });
-            } else {
-                document.exitFullscreen();
-            }
-        });
+        // プレイヤーコンテナの背景色を更新する関数
+        function updateBackgroundColor(color) {
+            document.documentElement.style.setProperty('--theme-color', color);
+            // フルスクリーン背景色も更新
+            document.body.style.backgroundColor = color;
+        }
+
+        // シークバーをリセットする関数
+        function resetProgress() {
+            progressFill.style.width = '0%';
+            progressHandle.style.left = '0%';
+            currentTimeEl.textContent = '0:00';
+        }
 
         // 初期テーマカラーの設定
         window.addEventListener('DOMContentLoaded', () => {
             playerContainer.style.backgroundColor = puzzles[currentPuzzle].themeColor;
+            updateBackgroundColor(puzzles[currentPuzzle].themeColor);
+            renderMarkers();
         });
+
+        // オーディオ再生時にマーカーをレンダリング
+        if (audio) {
+            audio.addEventListener('timeupdate', renderMarkers);
+        }
     </script>
 </body>
 </html>
