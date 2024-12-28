@@ -15,13 +15,15 @@
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: #000000;
             color: #ffffff;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            height: 100vh;
+            overflow: hidden; /* スクロール禁止 */
         }
 
         .player-container {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
             width: 100%;
             max-width: 400px;
             padding: 20px;
@@ -35,12 +37,26 @@
             aspect-ratio: 1;
             border-radius: 0;
             overflow: hidden;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            position: relative;
         }
 
-        .cover-art img {
+        .puzzle-image {
             width: 100%;
             height: 100%;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+
+        .puzzle-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            transition: opacity 0.5s;
             object-fit: cover;
         }
 
@@ -64,6 +80,7 @@
             width: 100%;
             position: relative;
             padding: 4px 0;
+            margin: 10px 0;
         }
 
         .progress-bar-bg {
@@ -71,16 +88,40 @@
             height: 4px;
             background: #4f4f4f;
             border-radius: 2px;
-            overflow: hidden;
             cursor: pointer;
+            position: relative;
         }
 
         .progress-bar-fill {
             width: 0%;
             height: 100%;
             background: #ffffff;
-            border-radius: 2px;
+            position: absolute;
+            left: 0;
+            top: 0;
             transition: width 0.1s linear;
+        }
+
+        .progress-handle {
+            width: 12px;
+            height: 12px;
+            background: #ffffff;
+            border-radius: 50%;
+            position: absolute;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            left: 0%;
+            transition: all 0.1s ease;
+            z-index: 2;
+        }
+
+        .progress-bar-bg:hover .progress-handle {
+            transform: translate(-50%, -50%) scale(1.2);
+        }
+
+        .progress-bar.dragging .progress-handle {
+            transform: translate(-50%, -50%) scale(1.4);
+            box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
         }
 
         .progress-time {
@@ -108,11 +149,7 @@
             align-items: center;
             justify-content: center;
             opacity: 0.9;
-            transition: opacity 0.2s;
-        }
-
-        .control-button:hover {
-            opacity: 1;
+            transition: all 0.2s;
         }
 
         .play-button {
@@ -124,21 +161,14 @@
             font-size: 24px;
         }
 
-        .play-button:hover {
-            transform: scale(1.04);
-        }
-
         .side-button {
             font-size: 20px;
             opacity: 0.7;
         }
 
         @media (hover: hover) {
-            .progress-bar-bg:hover .progress-bar-fill {
-                background: #1db954;
-            }
-
             .control-button:hover {
+                opacity: 1;
                 transform: scale(1.1);
             }
         }
@@ -147,7 +177,8 @@
 <body>
     <div class="player-container">
         <div class="cover-art">
-            <img src="/api/placeholder/400/400" alt="問題画像">
+            <img class="puzzle-image" src="/api/placeholder/400/400" alt="問題画像">
+            <img class="puzzle-overlay" src="/api/placeholder/400/400" alt="問題画像オーバーレイ">
         </div>
         
         <div class="track-info">
@@ -158,6 +189,7 @@
         <div class="progress-bar">
             <div class="progress-bar-bg">
                 <div class="progress-bar-fill" id="progressFill"></div>
+                <div class="progress-handle" id="progressHandle"></div>
             </div>
             <div class="progress-time">
                 <span id="currentTime">0:00</span>
@@ -167,24 +199,106 @@
 
         <div class="controls">
             <button class="control-button side-button" id="prevBtn">
-                ⏮
+                <img src="assets/images/controls/prev.svg" alt="Previous" class="control-icon">
             </button>
             <button class="control-button play-button" id="playBtn">
-                ▶
+                <img src="assets/images/controls/play.svg" alt="Play" class="control-icon" id="playIcon">
             </button>
             <button class="control-button side-button" id="nextBtn">
-                ⏭
+                <img src="assets/images/controls/next.svg" alt="Next" class="control-icon">
             </button>
         </div>
     </div>
 
     <script>
-        const playBtn = document.getElementById('playBtn');
-        const progressFill = document.getElementById('progressFill');
-        const currentTimeEl = document.getElementById('currentTime');
+        const puzzles = [
+            {
+                id: 1,
+                title: "問題 01",
+                subtitle: "Start",
+                baseImage: "assets/images/puzzles/stage1.jpg",
+                overlayImage: "assets/images/puzzles/stage1_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 2,
+                title: "問題 02",
+                subtitle: "Deep",
+                baseImage: "assets/images/puzzles/stage2.jpg",
+                overlayImage: "assets/images/puzzles/stage2_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 3,
+                title: "問題 03",
+                subtitle: "Dive",
+                baseImage: "assets/images/puzzles/stage3.jpg",
+                overlayImage: "assets/images/puzzles/stage3_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 4,
+                title: "問題 04",
+                subtitle: "Dark",
+                baseImage: "assets/images/puzzles/stage4.jpg",
+                overlayImage: "assets/images/puzzles/stage4_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 5,
+                title: "問題 05",
+                subtitle: "Light",
+                baseImage: "assets/images/puzzles/stage5.jpg",
+                overlayImage: "assets/images/puzzles/stage5_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 6,
+                title: "問題 06",
+                subtitle: "Rise",
+                baseImage: "assets/images/puzzles/stage6.jpg",
+                overlayImage: "assets/images/puzzles/stage6_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 7,
+                title: "問題 07",
+                subtitle: "Fall",
+                baseImage: "assets/images/puzzles/stage7.jpg",
+                overlayImage: "assets/images/puzzles/stage7_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            },
+            {
+                id: 8,
+                title: "問題 08",
+                subtitle: "End",
+                baseImage: "assets/images/puzzles/stage8.jpg",
+                overlayImage: "assets/images/puzzles/stage8_reveal.jpg",
+                revealTime: 90,
+                duration: 180
+            }
+        ];
+
+        let currentPuzzle = 0;
         let isPlaying = false;
         let progress = 0;
         let progressInterval;
+        let audio = new Audio('assets/audio/USAO_Climax.mp3');
+
+        const playBtn = document.getElementById('playBtn');
+        const progressFill = document.getElementById('progressFill');
+        const currentTimeEl = document.getElementById('currentTime');
+        const puzzleImage = document.querySelector('.puzzle-image');
+        const puzzleOverlay = document.querySelector('.puzzle-overlay');
+        const trackTitle = document.querySelector('.track-title');
+        const trackArtist = document.querySelector('.track-artist');
 
         function formatTime(seconds) {
             const mins = Math.floor(seconds / 60);
@@ -194,16 +308,18 @@
 
         function updateProgress() {
             if (progress < 100) {
-                progress += (100 / (180 * 10)); // 3分（180秒）を想定
+                progress += (100 / (puzzles[currentPuzzle].duration * 10));
                 progressFill.style.width = `${progress}%`;
-                currentTimeEl.textContent = formatTime((progress / 100) * 180);
+                const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
+                currentTimeEl.textContent = formatTime(currentSeconds);
+
+                // 画像の変化処理
+                if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
+                    puzzleOverlay.style.opacity = "1";
+                }
             } else {
                 stopProgress();
-                isPlaying = false;
-                playBtn.textContent = '▶';
-                progress = 0;
-                progressFill.style.width = '0%';
-                currentTimeEl.textContent = '0:00';
+                resetPuzzle();
             }
         }
 
@@ -215,24 +331,114 @@
             clearInterval(progressInterval);
         }
 
+        function resetPuzzle() {
+            isPlaying = false;
+            playBtn.textContent = '▶';
+            progress = 0;
+            progressFill.style.width = '0%';
+            currentTimeEl.textContent = '0:00';
+            puzzleOverlay.style.opacity = "0";
+        }
+
+        function loadPuzzle(index) {
+            const puzzle = puzzles[index];
+            puzzleImage.src = puzzle.baseImage;
+            puzzleOverlay.src = puzzle.overlayImage;
+            trackTitle.textContent = puzzle.title;
+            trackArtist.textContent = puzzle.subtitle;
+            document.getElementById('totalTime').textContent = formatTime(puzzle.duration);
+            resetPuzzle();
+        }
+
         playBtn.addEventListener('click', () => {
             isPlaying = !isPlaying;
             playBtn.textContent = isPlaying ? '⏸' : '▶';
             
             if (isPlaying) {
                 startProgress();
+                audio.play();
+                playIcon.src = 'assets/images/controls/pause.svg';
             } else {
                 stopProgress();
+                audio.pause();
+                playIcon.src = 'assets/images/controls/play.svg';
             }
         });
 
-        document.querySelector('.progress-bar-bg').addEventListener('click', (e) => {
-            const rect = e.target.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            progress = (x / rect.width) * 100;
-            progressFill.style.width = `${progress}%`;
-            currentTimeEl.textContent = formatTime((progress / 100) * 180);
+        document.getElementById('nextBtn').addEventListener('click', () => {
+            currentPuzzle = (currentPuzzle + 1) % puzzles.length;
+            loadPuzzle(currentPuzzle);
         });
+
+        document.getElementById('prevBtn').addEventListener('click', () => {
+            currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
+            loadPuzzle(currentPuzzle);
+        });
+
+        // シークバーのドラッグ機能
+        const progressBar = document.querySelector('.progress-bar');
+        const progressBg = document.querySelector('.progress-bar-bg');
+        const progressHandle = document.getElementById('progressHandle');
+        let isDragging = false;
+
+        function updateSeekPosition(e) {
+            const rect = progressBg.getBoundingClientRect();
+            let x = e.clientX - rect.left;
+            x = Math.max(0, Math.min(x, rect.width));
+            progress = (x / rect.width) * 100;
+            
+            progressFill.style.width = `${progress}%`;
+            progressHandle.style.left = `${progress}%`;
+            
+            const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
+            currentTimeEl.textContent = formatTime(currentSeconds);
+
+            if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
+                puzzleOverlay.style.opacity = "1";
+            } else {
+                puzzleOverlay.style.opacity = "0";
+            }
+        }
+
+        progressBg.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            progressBar.classList.add('dragging');
+            updateSeekPosition(e);
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (isDragging) {
+                updateSeekPosition(e);
+            }
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (isDragging) {
+                isDragging = false;
+                progressBar.classList.remove('dragging');
+            }
+        });
+
+        // プログレスバーの更新時にハンドルも更新
+        function updateProgress() {
+            if (progress < 100) {
+                progress += (100 / (puzzles[currentPuzzle].duration * 10));
+                progressFill.style.width = `${progress}%`;
+                progressHandle.style.left = `${progress}%`;
+                const currentSeconds = (progress / 100) * puzzles[currentPuzzle].duration;
+                currentTimeEl.textContent = formatTime(currentSeconds);
+
+                if (currentSeconds >= puzzles[currentPuzzle].revealTime) {
+                    puzzleOverlay.style.opacity = "1";
+                }
+            } else {
+                stopProgress();
+                resetPuzzle();
+            }
+        }
+
+        // 初期問題の読み込み
+        loadPuzzle(currentPuzzle);
     </script>
 </body>
 </html>
