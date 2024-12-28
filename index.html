@@ -14,7 +14,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #000000;
+            background: var(--theme-color, #000000); /* テーマカラーを背景に設定 */
             color: #ffffff;
             height: 100vh;
             overflow: hidden; /* スクロール禁止 */
@@ -32,6 +32,19 @@
             padding: 0;
         }
 
+        /* 背景オーバーレイ */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5); /* 半透明の黒 */
+            z-index: -1;
+            transition: background-color 0.5s ease;
+        }
+
         /* プレイヤーコンテナ */
         .player-container {
             position: relative;
@@ -45,20 +58,6 @@
             overflow: hidden;
             border-radius: 10px;
             background: rgba(0, 0, 0, 0.9); /* 背景の明るさを下げる（黒寄りに） */
-        }
-
-        /* 背景オーバーレイ */
-        body::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: var(--theme-color, #000000);
-            opacity: 0.5; /* 不透明度を上げて黒寄りに */
-            z-index: -1;
-            transition: background-color 0.5s ease;
         }
 
         /* 画像コンテナ */
@@ -391,6 +390,7 @@
         ];
 
         let currentPuzzle = 0;
+        let currentProgress = 0; // これまでに解決した最大のパズルインデックス
         let isPlaying = false;
         let audio = null;
 
@@ -411,7 +411,7 @@
         const nextBtn = document.getElementById('nextBtn');
 
         // フラグ管理
-        let currentProgress = 0; // 現在までに解決した最大のパズルインデックス
+        // let currentProgress = 0; // 現在までに解決した最大のパズルインデックス
 
         // スワイプ用変数
         let touchStartX = 0;
@@ -659,56 +659,65 @@
 
         // 次へボタンのクリックイベント
         nextBtn.addEventListener('click', () => {
-            const puzzle = puzzles[currentPuzzle];
-            const allowedRanges = puzzle.allowedNextTimeRanges;
-            const currentSeconds = audio.currentTime;
+            if (currentPuzzle < puzzles.length - 1) {
+                const nextIndex = currentPuzzle + 1;
+                if (nextIndex <= currentProgress) {
+                    // 既に解決済みのパズルに対してはタイミングに関係なく次へ移動
+                    currentPuzzle = nextIndex;
+                    loadPuzzle(currentPuzzle, 'left');
+                } else if (nextIndex === currentProgress + 1) {
+                    const currentPuz = puzzles[currentPuzzle];
+                    const allowedRanges = currentPuz.allowedNextTimeRanges;
+                    const currentSeconds = audio.currentTime;
 
-            // チェック: 現在の時間が許可された範囲内かどうか
-            const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+                    // チェック: 現在の時間が許可された範囲内かどうか
+                    const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
 
-            if (currentPuzzle < currentProgress) {
-                // すでに解決済みのパズルに対してはタイミングを無視して次へ移動
-                currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-                loadPuzzle(currentPuzzle, 'left');
-            } else if (canProceed && !puzzles[currentPuzzle].solvedTime) {
-                // パズルを解決済みにする
-                puzzles[currentPuzzle].solvedTime = currentSeconds;
-                addMarker(currentSeconds, puzzles[currentPuzzle].themeColor);
-                currentProgress = Math.max(currentProgress, currentPuzzle + 1);
+                    if (canProceed && !currentPuz.solvedTime) {
+                        // パズルを解決済みにする
+                        currentPuz.solvedTime = currentSeconds;
+                        addMarker(currentSeconds, currentPuz.themeColor);
+                        currentProgress = Math.max(currentProgress, nextIndex);
 
-                // 次のパズルに移動
-                currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-                loadPuzzle(currentPuzzle, 'left');
-            } else if (!canProceed && !puzzles[currentPuzzle].solvedTime) {
-                // 振動アニメーションを追加
+                        // 次のパズルに移動
+                        currentPuzzle = nextIndex;
+                        loadPuzzle(currentPuzzle, 'left');
+                    } else if (!canProceed && !currentPuz.solvedTime) {
+                        // 振動アニメーションを追加
+                        nextBtn.classList.add('shake');
+                        // アニメーションが終了したらクラスを削除
+                        nextBtn.addEventListener('animationend', () => {
+                            nextBtn.classList.remove('shake');
+                        }, { once: true });
+                    }
+                }
+            } else {
+                // 最後のパズルの場合、何もしないまたは振動
                 nextBtn.classList.add('shake');
-                // アニメーションが終了したらクラスを削除
                 nextBtn.addEventListener('animationend', () => {
                     nextBtn.classList.remove('shake');
                 }, { once: true });
             }
-            // すでに解決済みの場合は何もしない
         });
 
         // 前へボタンのクリックイベント
         prevBtn.addEventListener('click', () => {
-            if (currentPuzzle > 0 && currentPuzzle < currentProgress) {
-                currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
-                loadPuzzle(currentPuzzle, 'right');
-            } else if (currentPuzzle === 0 && currentProgress > 0) {
-                // 1問目で戻るボタンを押しても8問目には移動できない
-                // 何もしないか、必要に応じてアラートを表示
-                // ここでは何もしない
-            } else if (currentPuzzle < currentProgress) {
-                // 解決済みのパズルに対してはタイミングを無視して前へ移動
-                currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
-                loadPuzzle(currentPuzzle, 'right');
+            if (currentPuzzle > 0) {
+                const prevIndex = currentPuzzle - 1;
+                if (prevIndex < currentProgress) {
+                    // 既に解決済みのパズルに対してはタイミングに関係なく前へ移動
+                    currentPuzzle = prevIndex;
+                    loadPuzzle(currentPuzzle, 'right');
+                } else {
+                    // 前のパズルに戻れない場合は振動
+                    prevBtn.classList.add('shake');
+                    prevBtn.addEventListener('animationend', () => {
+                        prevBtn.classList.remove('shake');
+                    }, { once: true });
+                }
             } else {
-                // 前のパズルに戻れない場合は振動
-                prevBtn.classList.add('shake');
-                prevBtn.addEventListener('animationend', () => {
-                    prevBtn.classList.remove('shake');
-                }, { once: true });
+                // 1問目で戻るボタンを押しても何もしない
+                // 何もしない
             }
         });
 
@@ -729,41 +738,56 @@
             if (Math.abs(diffX) > threshold) {
                 if (diffX > 0) {
                     // 右スワイプ
-                    if (currentPuzzle > 0 && currentPuzzle < currentProgress) {
-                        currentPuzzle = (currentPuzzle - 1 + puzzles.length) % puzzles.length;
-                        loadPuzzle(currentPuzzle, 'right');
-                    } else {
-                        // 前のパズルに戻れない場合は振動
-                        prevBtn.classList.add('shake');
-                        prevBtn.addEventListener('animationend', () => {
-                            prevBtn.classList.remove('shake');
-                        }, { once: true });
+                    if (currentPuzzle > 0) {
+                        const prevIndex = currentPuzzle - 1;
+                        if (prevIndex < currentProgress) {
+                            currentPuzzle = prevIndex;
+                            loadPuzzle(currentPuzzle, 'right');
+                        } else {
+                            // 前のパズルに戻れない場合は振動
+                            prevBtn.classList.add('shake');
+                            prevBtn.addEventListener('animationend', () => {
+                                prevBtn.classList.remove('shake');
+                            }, { once: true });
+                        }
                     }
                 } else {
                     // 左スワイプ
-                    const puzzle = puzzles[currentPuzzle];
-                    const allowedRanges = puzzle.allowedNextTimeRanges;
-                    const currentSeconds = audio.currentTime;
+                    if (currentPuzzle < puzzles.length - 1) {
+                        const nextIndex = currentPuzzle + 1;
+                        if (nextIndex <= currentProgress) {
+                            // 既に解決済みのパズルに対してはタイミングに関係なく次へ移動
+                            currentPuzzle = nextIndex;
+                            loadPuzzle(currentPuzzle, 'left');
+                        } else if (nextIndex === currentProgress + 1) {
+                            const currentPuz = puzzles[currentPuzzle];
+                            const allowedRanges = currentPuz.allowedNextTimeRanges;
+                            const currentSeconds = audio.currentTime;
 
-                    const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
+                            // チェック: 現在の時間が許可された範囲内かどうか
+                            const canProceed = allowedRanges.some(range => currentSeconds >= range.start && currentSeconds <= range.end);
 
-                    if (currentPuzzle < currentProgress) {
-                        // すでに解決済みのパズルに対してはタイミングを無視して次へ移動
-                        currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-                        loadPuzzle(currentPuzzle, 'left');
-                    } else if (canProceed && !puzzles[currentPuzzle].solvedTime) {
-                        // パズルを解決済みにする
-                        puzzles[currentPuzzle].solvedTime = currentSeconds;
-                        addMarker(currentSeconds, puzzles[currentPuzzle].themeColor);
-                        currentProgress = Math.max(currentProgress, currentPuzzle + 1);
+                            if (canProceed && !currentPuz.solvedTime) {
+                                // パズルを解決済みにする
+                                currentPuz.solvedTime = currentSeconds;
+                                addMarker(currentSeconds, currentPuz.themeColor);
+                                currentProgress = Math.max(currentProgress, nextIndex);
 
-                        // 次のパズルに移動
-                        currentPuzzle = (currentPuzzle + 1) % puzzles.length;
-                        loadPuzzle(currentPuzzle, 'left');
-                    } else if (!canProceed && !puzzles[currentPuzzle].solvedTime) {
-                        // 振動アニメーションを追加
+                                // 次のパズルに移動
+                                currentPuzzle = nextIndex;
+                                loadPuzzle(currentPuzzle, 'left');
+                            } else if (!canProceed && !currentPuz.solvedTime) {
+                                // 振動アニメーションを追加
+                                nextBtn.classList.add('shake');
+                                // アニメーションが終了したらクラスを削除
+                                nextBtn.addEventListener('animationend', () => {
+                                    nextBtn.classList.remove('shake');
+                                }, { once: true });
+                            }
+                        }
+                    } else {
+                        // 最後のパズルの場合、何もしないまたは振動
                         nextBtn.classList.add('shake');
-                        // アニメーションが終了したらクラスを削除
                         nextBtn.addEventListener('animationend', () => {
                             nextBtn.classList.remove('shake');
                         }, { once: true });
