@@ -36,7 +36,7 @@ const uiController = new UIController(domElements);
 
 // オーディオコントローラーの初期化
 const audioController = new AudioController(
-    'assets/audio/USAO_Climax.mp3',
+    'assets/audio/Unlimited Power.mp3',
     (currentTime, duration) => {
         uiController.updateProgressBar(currentTime, duration);
         if (puzzleManager) {

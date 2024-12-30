@@ -5,7 +5,7 @@ import { formatTime } from './utils.js';
 export class AudioController {
     constructor(audioSrc, onTimeUpdate, onEnded, onPlay, onPause) {
         this.audio = new Audio(audioSrc);
-        this.audio.loop = false;
+        this.audio.loop = true;
 
         this.audio.addEventListener('loadedmetadata', () => {
             if (onTimeUpdate) onTimeUpdate(this.audio.duration);
