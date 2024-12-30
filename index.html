@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Puzzle Player</title>
     <!-- 外部CSSファイルを読み込む -->
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="assets/css/styles.css">
 </head>
 <body>
     <div class="player-container" id="playerContainer">
@@ -59,8 +59,7 @@
         </div>
     </div>
 
-    <!-- ベースJavaScriptファイルを読み込む -->
-    <script src="assets/js/script.js"></script>
-    <!-- パズルごとのスクリプトはベーススクリプトから動的に読み込まれます -->
+    <!-- ベースJavaScriptファイルを読み込む（モジュールとして） -->
+    <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
