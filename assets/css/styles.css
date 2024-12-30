@@ -188,16 +188,16 @@ body::before {
     animation: shake 0.5s;
 }
 
-/* マーカーのスタイル */
+/* マーカーのスタイルを縦線に変更 */
 .marker {
     position: absolute;
-    top: -4px;
-    width: 2px;
-    height: 12px;
-    background: #FF0000; /* 初期色は赤 */
-    /* オプション: 色や形を調整 */
+    top: -6px; /* マーカーを中央に配置 */
+    width: 2px; /* 縦線の幅 */
+    height: 16px; /* 縦線の高さ */
+    background: var(--marker-color); /* CSS変数を使用 */
+    border: 1px solid var(--marker-border-color); /* CSS変数を使用 */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* 影を追加 */
 }
-
 /* コントロールボタン */
 .controls {
     display: flex;

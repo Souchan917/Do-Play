@@ -1,6 +1,6 @@
 // assets/js/uiController.js
 
-import { formatTime, triggerShake } from './utils.js';
+import { formatTime, triggerShake, adjustColor } from './utils.js'; // adjustColorを追加
 
 export class UIController {
     constructor(domElements) {
@@ -74,7 +74,13 @@ export class UIController {
         const marker = document.createElement('div');
         marker.classList.add('marker');
         marker.style.left = `${progressPercent}%`;
-        marker.style.background = color;
+        
+        // 色を調整して視認性を確保
+        const adjustedColor = adjustColor(color, 0.8); // 明度を調整
+        const adjustedBorderColor = adjustColor(color, 0.2); // 明度を調整
+        marker.style.background = adjustedColor;
+        marker.style.border = `1px solid ${adjustedBorderColor}`;
+        
         this.progressBg.appendChild(marker);
     }
 

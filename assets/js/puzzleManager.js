@@ -17,22 +17,26 @@ export class PuzzleManager {
         // テーマカラーの適用
         this.ui.updateBackgroundColor(puzzle.themeColor);
 
+        // マーカーの色を固定色に設定（例: 白と黒）
+        document.documentElement.style.setProperty('--marker-color', '#FFFFFF');
+        document.documentElement.style.setProperty('--marker-border-color', '#000000');
+
         // トラック情報の更新
         this.ui.updateTrackInfo(puzzle.title, puzzle.subtitle);
 
-        // 答えの更新
+        // 答えの表示
         this.ui.displayAnswer(puzzle.answer);
 
         // 画像の更新
         this.ui.updateImages(puzzle.baseImage);
 
-        // オーバーレイ画像の更新
+        // オーバーレイの更新
         this.ui.updateOverlay("0");
 
-        // マーカーのレンダリング（現在のパズルのみ）
+        // 現在のパズルのマーカーをレンダリング
         this.renderMarkers(puzzle);
 
-        // 動的にパズル用スクリプトをロード
+        // パズル用スクリプトのロード
         this.loadMovableScript(puzzle);
     }
 
@@ -47,7 +51,7 @@ export class PuzzleManager {
     loadMovableScript(puzzle) {
         if (!puzzle.movableScript) return;
 
-        // 既にスクリプトがロードされている場合は削除
+        // 既存のスクリプトを削除
         if (this.currentMovableScript) {
             this.currentMovableScript.remove();
             this.currentMovableScript = null;
@@ -55,7 +59,7 @@ export class PuzzleManager {
 
         const script = document.createElement('script');
         script.src = puzzle.movableScript;
-        script.type = 'module'; // モジュールとして読み込む
+        script.type = 'module';
         script.defer = true;
 
         script.onload = () => {
@@ -77,6 +81,10 @@ export class PuzzleManager {
         if (puzzle && puzzle.solvedTime === null) {
             puzzle.solvedTime = time;
             this.currentProgress = Math.max(this.currentProgress, index + 1);
+            // 現在のパズルに対してのみマーカーをレンダリング
+            if (this.currentPuzzleIndex === index) {
+                this.renderMarkers(puzzle);
+            }
         }
     }
 
@@ -95,7 +103,6 @@ export class PuzzleManager {
 
                 if (canProceed && !currentPuz.solvedTime) {
                     this.addSolvedTime(this.currentPuzzleIndex, currentSeconds);
-                    this.renderMarkers(this.puzzles[this.currentPuzzleIndex]);
                     this.currentPuzzleIndex = nextIndex;
                     this.loadPuzzle(this.currentPuzzleIndex, 'left');
                 } else {
