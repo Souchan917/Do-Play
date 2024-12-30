@@ -93,7 +93,7 @@ body::before {
 /* プレイヤーコンテナ */
 .player-container {
     position: relative;
-    width: 90%; /* 幅を100%に変更 */
+    width: 95%; /* 幅を100%に変更 */
     max-width: 400px; /* 最大幅を800pxに拡大 */
     padding: 20px;
     display: flex;
@@ -307,8 +307,8 @@ body::before {
 
 /* サイドボタン（前へ、次へ） */
 .side-button {
-    width: 60px; /* サイズを60pxに調整 */
-    height: 60px;
+    width: 70px; /* サイズを60pxに調整 */
+    height: 70px;
 }
 
 /* 再生/停止ボタン */
