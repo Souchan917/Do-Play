@@ -15,26 +15,32 @@ export class PuzzleManager {
     loadPuzzle(index, direction = 'none') {
         const puzzle = this.puzzles[index];
         if (!puzzle) return;
-
+    
+        // ここから追加する新しいコード
+        if (this.ui.movablePart) {
+            if (puzzle.id === 3) {  // パズル3の場合
+                this.ui.movablePart.style.display = 'block';
+                this.ui.movablePart.style.position = 'absolute';
+                this.ui.movablePart.style.width = '100%';
+                this.ui.movablePart.style.height = '100%';
+                this.ui.movablePart.style.top = '0';
+                this.ui.movablePart.style.left = '0';
+                this.ui.movablePart.style.zIndex = '2';
+            } else {
+                this.ui.movablePart.style.display = 'none';  // パズル3以外は非表示
+            }
+        }
+        // ここまでが新しく追加するコード
+    
         // テーマカラーの適用
         this.ui.updateBackgroundColor(puzzle.themeColor);
-
-        // トラック情報の更新
+    
+        // 以下は既存のコード
         this.ui.updateTrackInfo(puzzle.title, puzzle.subtitle);
-
-        // 答えの表示
         this.ui.displayAnswer(puzzle.answer);
-
-        // 画像の更新
         this.ui.updateImages(puzzle.baseImage);
-
-        // オーバーレイの更新
         this.ui.updateOverlay("0");
-
-        // 現在のパズルのマーカーをレンダリング
         this.renderMarkers();
-
-        // パズル用スクリプトのロード
         this.loadMovableScript(puzzle);
     }
 
@@ -53,29 +59,37 @@ export class PuzzleManager {
     }
 
     loadMovableScript(puzzle) {
-        if (!puzzle.movableScript) return;
-
-        // 既存のスクリプトを削除
+        console.log('Loading script for puzzle:', puzzle.id);
+        if (!puzzle.movableScript) {
+            console.log('No movable script defined for this puzzle');
+            return;
+        }
+    
         if (this.currentMovableScript) {
+            console.log('Removing previous script');
             this.currentMovableScript.remove();
             this.currentMovableScript = null;
         }
-
+    
         const script = document.createElement('script');
         script.src = puzzle.movableScript;
         script.type = 'module';
         script.defer = true;
-
+    
         script.onload = () => {
+            console.log('Script loaded successfully:', puzzle.movableScript);
             if (typeof initPuzzle === 'function') {
+                console.log('initPuzzle function found, executing...');
                 initPuzzle(this.audio.audio, this.ui.movablePart, this.puzzles, this.currentPuzzleIndex, this);
+            } else {
+                console.warn('initPuzzle function not found');
             }
         };
-
-        script.onerror = () => {
-            console.error(`Failed to load script: ${puzzle.movableScript}`);
+    
+        script.onerror = (error) => {
+            console.error('Failed to load script:', puzzle.movableScript, error);
         };
-
+    
         document.body.appendChild(script);
         this.currentMovableScript = script;
     }
