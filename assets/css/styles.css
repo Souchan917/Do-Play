@@ -196,7 +196,7 @@ body::before {
     height: 16px; /* 縦線の高さ */
     background: var(--marker-color); /* CSS変数を使用 */
     border: 1px solid var(--marker-border-color); /* CSS変数を使用 */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5); /* 影を追加 */
+
 }
 /* コントロールボタン */
 .controls {
