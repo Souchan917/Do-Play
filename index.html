@@ -3,48 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Puzzle Player</title>
-    <!-- 外部CSSファイルを読み込む -->
+    <title>パズルゲーム</title>
     <link rel="stylesheet" href="assets/css/styles.css">
+    <!-- p5.js のCDNを追加 -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" integrity="sha512-/o7p4Vb+miE6Fd8FYNi24XbUgG9xIocEkWazlNi0LPXEJpR2+W20J+r/ilWcRdaUwsBjOcwfsfV1UBiCF/EOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="player-container" id="playerContainer">
+        <!-- 画像コンテナ -->
         <div class="cover-art-container">
             <div class="cover-art-wrapper">
-                <img class="cover-art current" src="assets/images/puzzles/stage1.jpg" alt="問題画像" id="currentImage">
-                <img class="cover-art next" src="" alt="問題画像" id="nextImage">
+                <img src="assets/images/puzzles/stage1.jpg" alt="Current Puzzle" class="cover-art current" id="currentImage">
+                <img src="assets/images/puzzles/stage1_reveal.jpg" alt="Overlay" class="puzzle-overlay" id="puzzleOverlay">
+                <!-- 次の画像は動的に変更 -->
+                <img src="" alt="Next Puzzle" class="cover-art next" id="nextImage">
             </div>
-            <img class="puzzle-overlay" src="assets/images/puzzles/stage1_reveal.jpg" alt="問題画像オーバーレイ" id="puzzleOverlay">
-            
-            <!-- 動かす部分の要素を追加 -->
+            <!-- 動かす部分 -->
             <div class="movable-part" id="movablePart">
-                <!-- アニメーション用の要素 -->
-                <div class="animated-shape" id="animatedShape"></div>
-                <!-- 既存の動く部分（必要に応じて） -->
-                <!-- <img src="assets/images/puzzles/movable_elements/puzzle1/movable.png" alt="動く部分" /> -->
+                <!-- p5.js のキャンバスがここに描画されます -->
             </div>
         </div>
-        
+
+        <!-- プログレスバー -->
         <div class="progress-bar">
             <div class="progress-bar-bg" id="progressBg">
                 <div class="progress-bar-fill" id="progressFill"></div>
                 <div class="progress-handle" id="progressHandle"></div>
-                <!-- マーカーがここに追加されます -->
+                <!-- マーカーはJavaScriptで動的に追加 -->
             </div>
             <div class="progress-time">
                 <span id="currentTime">0:00</span>
-                <span id="totalTime">3:00</span>
+                <span id="totalTime">0:00</span>
             </div>
         </div>
 
+        <!-- トラック情報 -->
         <div class="track-info">
-            <div class="track-title" id="trackTitle">問題 01</div>
-            <div class="track-artist" id="trackArtist">謎解きシリーズ</div>
+            <div class="track-title" id="trackTitle">問題タイトル</div>
+            <div class="track-artist" id="trackArtist">問題サブタイトル</div>
         </div>
 
+
+
+        <!-- コントロールボタン -->
         <div class="controls">
             <button class="control-button side-button" id="prevBtn">
-                <img src="assets/images/controls/prev.png" alt="Previous" class="control-icon">
+                <img src="assets/images/controls/prev.png" alt="Prev" class="control-icon">
             </button>
             <button class="control-button play-button" id="playBtn">
                 <img src="assets/images/controls/play.png" alt="Play" class="control-icon" id="playIcon">
@@ -54,12 +58,11 @@
             </button>
         </div>
 
-        <div class="answer-info" id="answerInfo">
-            答え: <span id="answerText">答えがここに表示されます</span>
-        </div>
+            <!-- 答え表示 -->
+            <div class="answer-info" id="answerText">答え: 未表示</div>
     </div>
 
-    <!-- ベースJavaScriptファイルを読み込む（モジュールとして） -->
+    <!-- モジュールとしてmain.jsを読み込む -->
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>

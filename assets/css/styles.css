@@ -180,6 +180,7 @@ body::before {
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
 
+
 /* =========================
    トラック情報
 ========================= */
@@ -233,7 +234,7 @@ body::before {
     justify-content: center;
     align-items: center;
     gap: 32px;
-    margin-top: 16px; /* 少し上に移動 */
+    margin-top: 0px; /* 少し上に移動 */
 }
 
 .control-button {
@@ -289,7 +290,9 @@ body::before {
     height: 20%; /* 高さも設定 */
     transition: left 0.1s linear, opacity 0.5s ease, transform 0.1s linear;
     z-index: 3; /* 画像より上に表示 */
+    background: transparent; /* 透明背景 */
 }
+
 
 
 /* =========================
