@@ -1,5 +1,3 @@
-// assets/js/uiController.js
-
 import { formatTime, triggerShake, adjustColor } from './utils.js';
 
 export class UIController {
@@ -24,48 +22,89 @@ export class UIController {
     }
 
     updatePlayButton(isPlaying) {
-        if (isPlaying) {
-            this.playIcon.src = "assets/images/controls/pause.png";
-            this.playIcon.alt = "Pause";
-        } else {
-            this.playIcon.src = "assets/images/controls/play.png";
-            this.playIcon.alt = "Play";
+        try {
+            if (isPlaying) {
+                this.playIcon.src = "assets/images/controls/pause.png";
+                this.playIcon.alt = "Pause";
+                console.log('UIController: Play button updated to Pause');
+            } else {
+                this.playIcon.src = "assets/images/controls/play.png";
+                this.playIcon.alt = "Play";
+                console.log('UIController: Play button updated to Play');
+            }
+        } catch (error) {
+            console.error('UIController:updatePlayButton: Failed to update play button', error);
         }
     }
 
     updateProgressBar(currentTime, duration) {
-        const progressPercent = (currentTime / duration) * 100;
-        this.progressFill.style.width = `${progressPercent}%`;
-        this.progressHandle.style.left = `${progressPercent}%`;
-        this.currentTimeEl.textContent = formatTime(currentTime);
+        try {
+            const progressPercent = (currentTime / duration) * 100;
+            this.progressFill.style.width = `${progressPercent}%`;
+            this.progressHandle.style.left = `${progressPercent}%`;
+            this.currentTimeEl.textContent = formatTime(currentTime);
+            console.log(`UIController: Progress bar updated: ${formatTime(currentTime)} / ${formatTime(duration)}`);
+        } catch (error) {
+            console.error('UIController:updateProgressBar: Failed to update progress bar', error);
+        }
     }
 
     updateTotalTime(duration) {
-        this.totalTimeEl.textContent = formatTime(duration);
+        try {
+            this.totalTimeEl.textContent = formatTime(duration);
+            console.log(`UIController: Total time updated: ${formatTime(duration)}`);
+        } catch (error) {
+            console.error('UIController:updateTotalTime: Failed to update total time', error);
+        }
     }
 
     updateImages(currentSrc, nextSrc = '') {
-        this.currentImage.src = currentSrc;
-        this.nextImage.src = nextSrc;
+        try {
+            this.currentImage.src = currentSrc;
+            this.nextImage.src = nextSrc;
+            console.log(`UIController: Images updated: currentSrc=${currentSrc}, nextSrc=${nextSrc}`);
+        } catch (error) {
+            console.error('UIController:updateImages: Failed to update images', error);
+        }
     }
 
     updateOverlay(opacity) {
-        this.puzzleOverlay.style.opacity = opacity;
+        try {
+            this.puzzleOverlay.style.opacity = opacity;
+            console.log(`UIController: Overlay opacity updated to ${opacity}`);
+        } catch (error) {
+            console.error('UIController:updateOverlay: Failed to update overlay opacity', error);
+        }
     }
 
     updateTrackInfo(title, subtitle) {
-        this.trackTitle.textContent = title;
-        this.trackArtist.textContent = subtitle;
+        try {
+            this.trackTitle.textContent = title;
+            this.trackArtist.textContent = subtitle;
+            console.log(`UIController: Track info updated: Title=${title}, Subtitle=${subtitle}`);
+        } catch (error) {
+            console.error('UIController:updateTrackInfo: Failed to update track info', error);
+        }
     }
 
     updateBackgroundColor(color) {
-        this.playerContainer.style.backgroundColor = color;
-        document.documentElement.style.setProperty('--theme-color', color);
-        document.body.style.backgroundColor = color;
+        try {
+            this.playerContainer.style.backgroundColor = color;
+            document.documentElement.style.setProperty('--theme-color', color);
+            document.body.style.backgroundColor = color;
+            console.log(`UIController: Background color updated to ${color}`);
+        } catch (error) {
+            console.error('UIController:updateBackgroundColor: Failed to update background color', error);
+        }
     }
 
     displayAnswer(answer) {
-        this.answerText.textContent = answer;
+        try {
+            this.answerText.textContent = `答え: ${answer}`;
+            console.log(`UIController: Answer displayed: ${answer}`);
+        } catch (error) {
+            console.error('UIController:displayAnswer: Failed to display answer', error);
+        }
     }
 
     /**
@@ -74,38 +113,47 @@ export class UIController {
      * @param {string} color - マーカーの色（HEX形式）
      */
     addMarker(markerPercent, color) {
-        if (markerPercent < 0 || markerPercent > 100) {
-            console.warn(`無効なマーカーパーセンテージ: ${markerPercent}`);
-            return;
-        }
-
-        // 同じ位置にマーカーが既に存在するか確認
-        const existingMarkers = this.progressBg.querySelectorAll('.marker');
-        for (let marker of existingMarkers) {
-            if (parseFloat(marker.style.left) === markerPercent) {
-                // 既にマーカーが存在する場合は追加しない
+        try {
+            if (markerPercent < 0 || markerPercent > 100) {
+                console.warn(`UIController:addMarker: 無効なマーカーパーセンテージ: ${markerPercent}`);
                 return;
             }
+
+            // 既存のマーカーをすべてクリア
+            this.clearMarkers();
+
+            const marker = document.createElement('div');
+            marker.classList.add('marker');
+            marker.style.left = `${markerPercent}%`;
+
+            // マーカーの色を設定
+            marker.style.setProperty('--marker-color', color);
+            marker.style.setProperty('--marker-border-color', adjustColor(color, 0.2));
+
+            this.progressBg.appendChild(marker);
+            console.log(`UIController:addMarker: Marker added at ${markerPercent}% with color ${color}`);
+        } catch (error) {
+            console.error('UIController:addMarker: Failed to add marker', error);
         }
-
-        const marker = document.createElement('div');
-        marker.classList.add('marker');
-        marker.style.left = `${markerPercent}%`;
-
-        // マーカーの色を設定
-        marker.style.setProperty('--marker-color', color);
-        marker.style.setProperty('--marker-border-color', adjustColor(color, 0.2));
-
-        this.progressBg.appendChild(marker);
     }
 
     clearMarkers() {
-        const existingMarkers = this.progressBg.querySelectorAll('.marker');
-        existingMarkers.forEach(marker => marker.remove());
+        try {
+            const existingMarkers = this.progressBg.querySelectorAll('.marker');
+            existingMarkers.forEach(marker => marker.remove());
+            console.log('UIController: All markers cleared');
+        } catch (error) {
+            console.error('UIController:clearMarkers: Failed to clear markers', error);
+        }
     }
 
     triggerShakeAnimation(button) {
-        triggerShake(button);
+        try {
+            triggerShake(button);
+            console.log('UIController: Shake animation triggered');
+        } catch (error) {
+            console.error('UIController:triggerShakeAnimation: Failed to trigger shake animation', error);
+        }
     }
 
     /**
@@ -115,6 +163,13 @@ export class UIController {
      * @returns {string} - 調整後のHEX色コード
      */
     adjustMarkerColor(color, factor) {
-        return adjustColor(color, factor);
+        try {
+            const adjustedColor = adjustColor(color, factor);
+            console.log(`UIController: Marker color adjusted from ${color} to ${adjustedColor}`);
+            return adjustedColor;
+        } catch (error) {
+            console.error('UIController:adjustMarkerColor: Failed to adjust marker color', error);
+            return color; // 失敗した場合は元の色を返す
+        }
     }
 }

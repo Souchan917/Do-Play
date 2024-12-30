@@ -1,5 +1,3 @@
-// assets/js/data.js
-
 console.log('data.js loaded');
 
 // パズルデータ配列
@@ -15,7 +13,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 1, end: 10 }], // 1秒から10秒
         solvedTime: null, // 解決時の時間を記録
         answer: "答え1",
-        movableScript: "assets/js/puzzles/puzzle1.js",
+        movableScript: "puzzles/puzzle1.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 12.5, // プログレスバーの12.5%にマーカーを配置
         markerColor: "#FF0000" // 赤色のマーカー
@@ -31,7 +29,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 10, end: 20 }],
         solvedTime: null,
         answer: "答え2",
-        movableScript: "assets/js/puzzles/puzzle2.js",
+        movableScript: "puzzles/puzzle2.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 25, // プログレスバーの25%にマーカーを配置
         markerColor: "#FFA500" // オレンジ色のマーカー
@@ -47,7 +45,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 20, end: 30 }],
         solvedTime: null,
         answer: "答え3",
-        movableScript: "assets/js/puzzles/puzzle3.js",
+        movableScript: "puzzles/puzzle3.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 37.5, // プログレスバーの37.5%にマーカーを配置
         markerColor: "#FFFF00" // 黄色のマーカー
@@ -63,7 +61,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 30, end: 40 }],
         solvedTime: null,
         answer: "答え4",
-        movableScript: "assets/js/puzzles/puzzle4.js",
+        movableScript: "puzzles/puzzle4.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 50, // プログレスバーの50%にマーカーを配置
         markerColor: "#00FF00" // 緑色のマーカー
@@ -79,7 +77,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 40, end: 50 }],
         solvedTime: null,
         answer: "答え5",
-        movableScript: "assets/js/puzzles/puzzle5.js",
+        movableScript: "puzzles/puzzle5.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 62.5, // プログレスバーの62.5%にマーカーを配置
         markerColor: "#0000FF" // 青色のマーカー
@@ -95,7 +93,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 50, end: 60 }],
         solvedTime: null,
         answer: "答え6",
-        movableScript: "assets/js/puzzles/puzzle6.js",
+        movableScript: "puzzles/puzzle6.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 75, // プログレスバーの75%にマーカーを配置
         markerColor: "#4B0082" // インディゴ色のマーカー
@@ -111,7 +109,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 60, end: 70 }],
         solvedTime: null,
         answer: "答え7",
-        movableScript: "assets/js/puzzles/puzzle7.js",
+        movableScript: "puzzles/puzzle7.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 87.5, // プログレスバーの87.5%にマーカーを配置
         markerColor: "#800080" // 紫色のマーカー
@@ -127,7 +125,7 @@ export const puzzles = [
         allowedNextTimeRanges: [{ start: 70, end: 80 }],
         solvedTime: null,
         answer: "答え8",
-        movableScript: "assets/js/puzzles/puzzle8.js",
+        movableScript: "puzzles/puzzle8.js", // 相対パスに修正
         movableElementSrc: "",
         markerPositionPercent: 100, // プログレスバーの100%にマーカーを配置
         markerColor: "#000000" // 黒色のマーカー

@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>パズルゲーム</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <!-- p5.js のCDNを追加 -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" integrity="sha512-/o7p4Vb+miE6Fd8FYNi24XbUgG9xIocEkWazlNi0LPXEJpR2+W20J+r/ilWcRdaUwsBjOcwfsfV1UBiCF/EOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <!-- p5.js のCDNを修正（integrity 属性を削除） -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 </head>
 <body>
     <div class="player-container" id="playerContainer">
@@ -43,8 +43,6 @@
             <div class="track-artist" id="trackArtist">問題サブタイトル</div>
         </div>
 
-
-
         <!-- コントロールボタン -->
         <div class="controls">
             <button class="control-button side-button" id="prevBtn">
@@ -58,11 +56,11 @@
             </button>
         </div>
 
-            <!-- 答え表示 -->
-            <div class="answer-info" id="answerText">答え: 未表示</div>
+        <!-- 答え表示 -->
+        <div class="answer-info" id="answerText">答え: 未表示</div>
     </div>
 
-    <!-- モジュールとしてmain.jsを読み込む -->
+    <!-- main.js をモジュールとして読み込む -->
     <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
