@@ -1,14 +1,9 @@
 // assets/js/main.js
 
-console.log('main.js loaded');
-
 import { puzzles } from './data.js';
 import { AudioController } from './audioController.js';
 import { UIController } from './uiController.js';
 import { PuzzleManager } from './puzzleManager.js';
-
-console.log('Imported puzzles:', puzzles);
-
 
 // DOM要素の取得
 const domElements = {
@@ -36,7 +31,7 @@ const uiController = new UIController(domElements);
 
 // オーディオコントローラーの初期化
 const audioController = new AudioController(
-    'assets/audio/Unlimited Power.mp3',
+    'assets/audio/USAO_Climax.mp3',
     (currentTime, duration) => {
         uiController.updateProgressBar(currentTime, duration);
         if (puzzleManager) {
@@ -51,7 +46,6 @@ const audioController = new AudioController(
     () => {
         // オーディオ再生終了時の処理
         uiController.updatePlayButton(false);
-        // プログレスをリセットする場合はここで行う
     },
     () => {
         uiController.updatePlayButton(true);
@@ -61,9 +55,44 @@ const audioController = new AudioController(
     }
 );
 
+// 進捗データの取得
+function getProgressData() {
+    try {
+        const data = sessionStorage.getItem('puzzleProgress');
+        if (data) {
+            return JSON.parse(data);
+        }
+    } catch (error) {
+        console.error('進捗データの取得に失敗しました:', error);
+    }
+    return {
+        currentPuzzleIndex: 0,
+        solvedPuzzles: []
+    };
+}
+
+// 進捗データの保存
+function saveProgressData(progressData) {
+    try {
+        sessionStorage.setItem('puzzleProgress', JSON.stringify(progressData));
+    } catch (error) {
+        console.error('進捗データの保存に失敗しました:', error);
+    }
+}
+
 // パズルマネージャーの初期化
-const puzzleManager = new PuzzleManager(puzzles, uiController, audioController);
-puzzleManager.loadPuzzle(0);
+const initialProgress = getProgressData();
+const puzzleManager = new PuzzleManager(puzzles, uiController, audioController, initialProgress);
+puzzleManager.loadPuzzle(initialProgress.currentPuzzleIndex);
+
+// 進捗が更新された際に `sessionStorage` を更新
+puzzleManager.onProgressUpdate = (currentPuzzleIndex, solvedPuzzles) => {
+    const progressData = {
+        currentPuzzleIndex,
+        solvedPuzzles
+    };
+    saveProgressData(progressData);
+};
 
 // 再生ボタンのクリックイベント
 uiController.playBtn.addEventListener('click', () => {

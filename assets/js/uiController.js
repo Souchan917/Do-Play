@@ -1,6 +1,6 @@
 // assets/js/uiController.js
 
-import { formatTime, triggerShake, adjustColor } from './utils.js'; // adjustColorを追加
+import { formatTime, triggerShake, adjustColor } from './utils.js';
 
 export class UIController {
     constructor(domElements) {
@@ -68,19 +68,34 @@ export class UIController {
         this.answerText.textContent = answer;
     }
 
-    addMarker(time, color, duration) {
-        if (!duration) return;
-        const progressPercent = (time / duration) * 100;
+    /**
+     * マーカーを追加する関数
+     * @param {number} markerPercent - プログレスバー上の位置（パーセンテージ）
+     * @param {string} color - マーカーの色（HEX形式）
+     */
+    addMarker(markerPercent, color) {
+        if (markerPercent < 0 || markerPercent > 100) {
+            console.warn(`無効なマーカーパーセンテージ: ${markerPercent}`);
+            return;
+        }
+
+        // 同じ位置にマーカーが既に存在するか確認
+        const existingMarkers = this.progressBg.querySelectorAll('.marker');
+        for (let marker of existingMarkers) {
+            if (parseFloat(marker.style.left) === markerPercent) {
+                // 既にマーカーが存在する場合は追加しない
+                return;
+            }
+        }
+
         const marker = document.createElement('div');
         marker.classList.add('marker');
-        marker.style.left = `${progressPercent}%`;
-        
-        // 色を調整して視認性を確保
-        const adjustedColor = adjustColor(color, 0.8); // 明度を調整
-        const adjustedBorderColor = adjustColor(color, 0.2); // 明度を調整
-        marker.style.background = adjustedColor;
-        marker.style.border = `1px solid ${adjustedBorderColor}`;
-        
+        marker.style.left = `${markerPercent}%`;
+
+        // マーカーの色を設定
+        marker.style.setProperty('--marker-color', color);
+        marker.style.setProperty('--marker-border-color', adjustColor(color, 0.2));
+
         this.progressBg.appendChild(marker);
     }
 
@@ -91,5 +106,15 @@ export class UIController {
 
     triggerShakeAnimation(button) {
         triggerShake(button);
+    }
+
+    /**
+     * マーカーの色を調整する関数
+     * @param {string} color - HEX形式の色コード
+     * @param {number} factor - 明度調整の係数
+     * @returns {string} - 調整後のHEX色コード
+     */
+    adjustMarkerColor(color, factor) {
+        return adjustColor(color, factor);
     }
 }

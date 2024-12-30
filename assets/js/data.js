@@ -16,7 +16,9 @@ export const puzzles = [
         solvedTime: null, // 解決時の時間を記録
         answer: "答え1",
         movableScript: "assets/js/puzzles/puzzle1.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 12.5, // プログレスバーの12.5%にマーカーを配置
+        markerColor: "#FF0000" // 赤色のマーカー
     },
     {
         id: 2,
@@ -30,7 +32,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え2",
         movableScript: "assets/js/puzzles/puzzle2.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 25, // プログレスバーの25%にマーカーを配置
+        markerColor: "#FFA500" // オレンジ色のマーカー
     },
     {
         id: 3,
@@ -44,7 +48,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え3",
         movableScript: "assets/js/puzzles/puzzle3.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 37.5, // プログレスバーの37.5%にマーカーを配置
+        markerColor: "#FFFF00" // 黄色のマーカー
     },
     {
         id: 4,
@@ -58,7 +64,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え4",
         movableScript: "assets/js/puzzles/puzzle4.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 50, // プログレスバーの50%にマーカーを配置
+        markerColor: "#00FF00" // 緑色のマーカー
     },
     {
         id: 5,
@@ -72,7 +80,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え5",
         movableScript: "assets/js/puzzles/puzzle5.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 62.5, // プログレスバーの62.5%にマーカーを配置
+        markerColor: "#0000FF" // 青色のマーカー
     },
     {
         id: 6,
@@ -86,7 +96,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え6",
         movableScript: "assets/js/puzzles/puzzle6.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 75, // プログレスバーの75%にマーカーを配置
+        markerColor: "#4B0082" // インディゴ色のマーカー
     },
     {
         id: 7,
@@ -100,7 +112,9 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え7",
         movableScript: "assets/js/puzzles/puzzle7.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 87.5, // プログレスバーの87.5%にマーカーを配置
+        markerColor: "#800080" // 紫色のマーカー
     },
     {
         id: 8,
@@ -114,6 +128,8 @@ export const puzzles = [
         solvedTime: null,
         answer: "答え8",
         movableScript: "assets/js/puzzles/puzzle8.js",
-        movableElementSrc: ""
+        movableElementSrc: "",
+        markerPositionPercent: 100, // プログレスバーの100%にマーカーを配置
+        markerColor: "#000000" // 黒色のマーカー
     }
 ];

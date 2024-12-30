@@ -1,60 +1,34 @@
 // assets/js/audioController.js
 
-import { formatTime } from './utils.js';
-
 export class AudioController {
     constructor(audioSrc, onTimeUpdate, onEnded, onPlay, onPause) {
         this.audio = new Audio(audioSrc);
-        this.audio.loop = true;
-
-        this.audio.addEventListener('loadedmetadata', () => {
-            if (onTimeUpdate) onTimeUpdate(this.audio.duration);
-        });
-
+        this.audio.preload = 'auto';
         this.audio.addEventListener('timeupdate', () => {
-            if (onTimeUpdate) onTimeUpdate(this.audio.currentTime, this.audio.duration);
+            onTimeUpdate(this.audio.currentTime, this.audio.duration);
         });
-
-        this.audio.addEventListener('ended', () => {
-            if (onEnded) onEnded();
-        });
-
-        this.audio.addEventListener('play', () => {
-            if (onPlay) onPlay();
-        });
-
-        this.audio.addEventListener('pause', () => {
-            if (onPause) onPause();
-        });
-    }
-
-    play() {
-        return this.audio.play();
-    }
-
-    pause() {
-        this.audio.pause();
+        this.audio.addEventListener('ended', onEnded);
+        this.audio.addEventListener('play', onPlay);
+        this.audio.addEventListener('pause', onPause);
     }
 
     togglePlay() {
         if (this.audio.paused) {
-            this.play().catch(error => {
-                console.error('再生に失敗しました:', error);
-            });
+            this.audio.play();
         } else {
-            this.pause();
+            this.audio.pause();
         }
     }
 
-    seek(time) {
-        this.audio.currentTime = time;
+    getDuration() {
+        return this.audio.duration;
     }
 
     getCurrentTime() {
         return this.audio.currentTime;
     }
 
-    getDuration() {
-        return this.audio.duration;
+    seek(time) {
+        this.audio.currentTime = time;
     }
 }

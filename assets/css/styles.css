@@ -1,5 +1,8 @@
 /* styles.css */
 
+/* =========================
+   基本リセットとボックスサイズ
+========================= */
 /* リセットCSS */
 * {
     margin: 0;
@@ -40,6 +43,9 @@ body::before {
     transition: background-color 0.5s ease;
 }
 
+/* =========================
+   プレイヤーコンテナ
+========================= */
 /* プレイヤーコンテナ */
 .player-container {
     position: relative;
@@ -55,6 +61,9 @@ body::before {
     background: rgba(0, 0, 0, 0.9); /* 背景の明るさを下げる（黒寄りに） */
 }
 
+/* =========================
+   画像コンテナ
+========================= */
 /* 画像コンテナ */
 .cover-art-container {
     position: relative;
@@ -82,6 +91,11 @@ body::before {
     transition: transform 0.5s ease;
 }
 
+/* 次の画像は初期状態で非表示 */
+.cover-art.next {
+    opacity: 0;
+}
+
 /* オーバーレイ画像 */
 .puzzle-overlay {
     position: absolute;
@@ -94,6 +108,9 @@ body::before {
     object-fit: cover;
 }
 
+/* =========================
+   プログレスバー
+========================= */
 /* プログレスバー */
 .progress-bar {
     width: 90%; /* 幅を90%に変更 */
@@ -151,6 +168,21 @@ body::before {
     padding-top: 8px;
 }
 
+/* マーカーのスタイルを縦線に変更 */
+.marker {
+    position: absolute;
+    top: -6px; /* マーカーを中央に配置 */
+    width: 2px; /* 縦線の幅 */
+    height: 16px; /* 縦線の高さ */
+    background: var(--marker-color); /* CSS変数を使用 */
+    border: 1px solid var(--marker-border-color); /* CSS変数を使用 */
+    pointer-events: none; /* マーカーがクリックできないように */
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+}
+
+/* =========================
+   トラック情報
+========================= */
 .track-info {
     text-align: left;
     padding: 0 4px;
@@ -167,7 +199,9 @@ body::before {
     color: #b3b3b3;
 }
 
-/* 答え表示 */
+/* =========================
+   答え表示
+========================= */
 .answer-info {
     text-align: left;
     padding: 0 4px;
@@ -175,7 +209,9 @@ body::before {
     color: #00FF00; /* 仮の色（緑） */
 }
 
-/* 振動アニメーション */
+/* =========================
+   振動アニメーション
+========================= */
 @keyframes shake {
     0% { transform: translateX(0); }
     25% { transform: translateX(-5px); }
@@ -188,16 +224,9 @@ body::before {
     animation: shake 0.5s;
 }
 
-/* マーカーのスタイルを縦線に変更 */
-.marker {
-    position: absolute;
-    top: -6px; /* マーカーを中央に配置 */
-    width: 2px; /* 縦線の幅 */
-    height: 16px; /* 縦線の高さ */
-    background: var(--marker-color); /* CSS変数を使用 */
-    border: 1px solid var(--marker-border-color); /* CSS変数を使用 */
-
-}
+/* =========================
+   コントロールボタン
+========================= */
 /* コントロールボタン */
 .controls {
     display: flex;
@@ -248,6 +277,9 @@ body::before {
     display: block; /* 確実に表示されるように */
 }
 
+/* =========================
+   動かす部分のスタイル
+========================= */
 /* 動かす部分のスタイル */
 .movable-part {
     position: absolute;
@@ -259,4 +291,11 @@ body::before {
     z-index: 3; /* 画像より上に表示 */
 }
 
-/* アニメーション用の形はpuzzle1.jsで動的にスタイルを追加 */
+
+/* =========================
+   その他のスタイル
+========================= */
+/* スクロールバーのカスタマイズ（必要に応じて） */
+body {
+    overflow-y: hidden; /* 必要に応じて縦スクロールを無効化 */
+}
