@@ -49,11 +49,14 @@ export class PuzzleManager {
         this.ui.updateImages(puzzle.baseImage);
         this.ui.updateOverlay("0");
 
-        // マーカーの更新: 現在のパズルのマーカーのみ表示
+        // マーカーの更新: パズルが解決されている場合にのみ表示
         this.ui.clearMarkers();
-        this.ui.addMarker(puzzle.markerPositionPercent, puzzle.markerColor);
-
-        console.log(`PuzzleManager: Marker for puzzle ${puzzle.id} added at ${puzzle.markerPositionPercent}%`);
+        if (this.solvedPuzzles.includes(puzzle.id)) {
+            this.ui.addMarker(puzzle.markerPositionPercent, puzzle.markerColor);
+            console.log(`PuzzleManager: Marker for puzzle ${puzzle.id} added at ${puzzle.markerPositionPercent}%`);
+        } else {
+            console.log(`PuzzleManager: Puzzle ${puzzle.id} is not yet solved; no marker added`);
+        }
 
         // 動的スクリプトのロード
         await this.loadMovableScript(puzzle);
@@ -117,6 +120,11 @@ export class PuzzleManager {
                     this.onProgressUpdate(this.currentPuzzleIndex, this.solvedPuzzles);
                     console.log('PuzzleManager: Progress update callback invoked');
                 }
+
+                // パズルを再ロードしてマーカーを表示
+                this.loadPuzzle(this.currentPuzzleIndex).catch(error => {
+                    console.error(`PuzzleManager: Failed to reload puzzle ${this.currentPuzzleIndex}`, error);
+                });
             } else {
                 console.warn(`PuzzleManager: addSolvedTime: Puzzle at index ${index} not found or already solved`);
             }

@@ -122,6 +122,15 @@ export class UIController {
             // 既存のマーカーをすべてクリア
             this.clearMarkers();
 
+            // マーカーが既に存在するか確認（念のため）
+            const existingMarkers = this.progressBg.querySelectorAll('.marker');
+            for (let marker of existingMarkers) {
+                if (parseFloat(marker.style.left) === markerPercent) {
+                    console.log(`UIController:addMarker: Marker already exists at ${markerPercent}%`);
+                    return;
+                }
+            }
+
             const marker = document.createElement('div');
             marker.classList.add('marker');
             marker.style.left = `${markerPercent}%`;

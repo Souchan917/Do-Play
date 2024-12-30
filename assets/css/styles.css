@@ -42,13 +42,59 @@ body::before {
 }
 
 /* =========================
+   ロード画面のスタイル
+========================= */
+/* ロード画面のスタイル */
+#loading-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8); /* 半透明の黒 */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 最前面に表示 */
+    transition: opacity 0.5s ease, visibility 0.5s ease;
+    opacity: 1;
+    visibility: visible;
+}
+
+#loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.spinner {
+    border: 12px solid #f3f3f3; /* Light grey */
+    border-top: 12px solid #3498db; /* Blue */
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 2s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+#loading-screen p {
+    font-size: 24px;
+    color: #ffffff;
+}
+
+/* =========================
    プレイヤーコンテナ
 ========================= */
 /* プレイヤーコンテナ */
 .player-container {
     position: relative;
-    width: 90%; /* 幅を90%に変更 */
-    max-width: 400px;
+    width: 90%; /* 幅を100%に変更 */
+    max-width: 400px; /* 最大幅を800pxに拡大 */
     padding: 20px;
     display: flex;
     flex-direction: column;
@@ -111,10 +157,10 @@ body::before {
 ========================= */
 /* プログレスバー */
 .progress-bar {
-    width: 90%; /* 幅を90%に変更 */
+    width: 100%; /* 幅を100%に変更 */
     position: relative;
     padding: 4px 0;
-    margin: 10px auto; /* 中央揃え */
+    margin: 10px 0; /* 上下の余白のみ設定 */
 }
 
 .progress-bar-bg {
@@ -172,12 +218,11 @@ body::before {
     top: -6px; /* マーカーを中央に配置 */
     width: 2px; /* 縦線の幅 */
     height: 16px; /* 縦線の高さ */
-    background: var(--marker-color); /* CSS変数を使用 */
-    border: 1px solid var(--marker-border-color); /* CSS変数を使用 */
+    background: var(--marker-color, #ff0000); /* デフォルト色を赤に設定 */
+    border: 1px solid var(--marker-border-color, #ffffff); /* デフォルト枠色を白に設定 */
     pointer-events: none; /* マーカーがクリックできないように */
     box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
 }
-
 
 /* =========================
    トラック情報
@@ -245,6 +290,8 @@ body::before {
     padding: 0;
     opacity: 0.7;
     transition: opacity 0.2s;
+    width: 60px; /* サイズを60pxに縮小 */
+    height: 60px;
 }
 
 .control-button:hover {
@@ -260,14 +307,14 @@ body::before {
 
 /* サイドボタン（前へ、次へ） */
 .side-button {
-    width: 80px; /* サイズ拡大 */
-    height: 80px;
+    width: 60px; /* サイズを60pxに調整 */
+    height: 60px;
 }
 
 /* 再生/停止ボタン */
 .play-button {
-    width: 100px !important; /* サイズ拡大 */
-    height: 100px !important;
+    width: 80px !important; /* サイズを80pxに調整 */
+    height: 80px !important;
 }
 
 .play-button .control-icon {
@@ -291,7 +338,6 @@ body::before {
     display: none;  /* デフォルトは非表示 */
 }
 
-
 /* =========================
    その他のスタイル
 ========================= */
@@ -299,3 +345,4 @@ body::before {
 body {
     overflow-y: hidden; /* 必要に応じて縦スクロールを無効化 */
 }
+

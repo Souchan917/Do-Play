@@ -21,7 +21,8 @@ const domElements = {
     prevBtn: document.getElementById('prevBtn'),
     nextBtn: document.getElementById('nextBtn'),
     answerText: document.getElementById('answerText'),
-    movablePart: document.getElementById('movablePart')
+    movablePart: document.getElementById('movablePart'),
+    loadingScreen: document.getElementById('loading-screen') // ロード画面の要素を追加
 };
 
 // UIコントローラーの初期化
@@ -100,6 +101,70 @@ puzzleManager.onProgressUpdate = (currentPuzzleIndex, solvedPuzzles) => {
     };
     saveProgressData(progressData);
 };
+
+// すべてのリソースがロードされた後にロード画面を非表示にする関数
+function hideLoadingScreen() {
+    domElements.loadingScreen.classList.add('hidden');
+}
+
+// リソースのプリロード関数
+async function preloadResources() {
+    try {
+        const imagePromises = [];
+        puzzles.forEach(puzzle => {
+            // ベース画像とオーバーレイ画像のプリロード
+            ['baseImage', 'overlayImage'].forEach(imageKey => {
+                const img = new Image();
+                img.src = puzzle[imageKey];
+                const promise = new Promise((resolve, reject) => {
+                    img.onload = () => {
+                        console.log(`main.js: Image loaded: ${puzzle[imageKey]}`);
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.error(`main.js: Failed to load image: ${puzzle[imageKey]}`);
+                        reject(`Failed to load image: ${puzzle[imageKey]}`);
+                    };
+                });
+                imagePromises.push(promise);
+            });
+        });
+
+        // すべての画像がロードされるのを待つ
+        await Promise.all(imagePromises);
+        console.log('main.js: All images have been loaded');
+    } catch (error) {
+        console.error('main.js: preloadResources: エラーが発生しました:', error);
+    }
+}
+
+// ゲームの初期化関数
+async function initializeGame() {
+    try {
+        // リソースのプリロード
+        await preloadResources();
+
+        // ゲームの開始
+        audioController.audio.addEventListener('loadedmetadata', () => {
+            uiController.updateTotalTime(audioController.getDuration());
+            console.log('main.js: Audio metadata loaded');
+        });
+
+        // オーディオのプリロード
+        audioController.audio.load();
+
+        // ロード画面を非表示にする
+        hideLoadingScreen();
+        console.log('main.js: Loading screen hidden, game initialized');
+    } catch (error) {
+        console.error('main.js: initializeGame: ゲームの初期化に失敗しました:', error);
+    }
+}
+
+// ページロード完了後にゲームを初期化
+window.addEventListener('load', () => {
+    initializeGame();
+});
 
 // 再生ボタンのクリックイベント
 uiController.playBtn.addEventListener('click', () => {

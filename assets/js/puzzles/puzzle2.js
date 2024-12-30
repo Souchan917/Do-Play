@@ -15,42 +15,33 @@ export function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex, puzz
     }
 
     try {
-        // ここにパズル2のロジックを実装
-        // 例として簡単なp5.jsスケッチを作成
-        const sketch = (p) => {
-            p.setup = () => {
-                try {
-                    const width = movablePart.clientWidth;
-                    const height = movablePart.clientHeight;
-                    p.createCanvas(width, height).parent(movablePart);
-                    p.background(100);
-                    console.log('puzzle2.js: p5.js canvas created with width:', width, 'height:', height);
-                } catch (error) {
-                    console.error('puzzle2.js: p5.js setup: Failed to initialize canvas', error);
+        // カウントアップタイマーを表示するための要素を作成
+        const timerDisplay = document.createElement('div');
+        timerDisplay.style.fontSize = '48px';
+        timerDisplay.style.color = '#00FF00'; // 緑色
+        timerDisplay.style.textAlign = 'center';
+        timerDisplay.textContent = '1';
+        movablePart.appendChild(timerDisplay);
+        console.log('puzzle2.js: Timer display element created');
+
+        let count = 1;
+        const interval = setInterval(() => {
+            try {
+                count += 1;
+                timerDisplay.textContent = count;
+                console.log(`puzzle2.js: Timer updated to ${count}`);
+
+                // 10秒後にパズルを解決
+                if (count > 10) {
+                    clearInterval(interval);
+                    console.log('puzzle2.js: Timer completed, solving puzzle');
+                    puzzleManager.addSolvedTime(currentPuzzleIndex, audio.currentTime);
                 }
-            };
+            } catch (error) {
+                console.error('puzzle2.js: Interval callback error:', error);
+            }
+        }, 1000); // 1秒ごとにカウントアップ
 
-            p.draw = () => {
-                try {
-                    // パズル2の描画ロジック
-                    // 例: 円が拡大縮小するアニメーション
-                    p.background(100);
-                    p.fill(0, 255, 0);
-                    p.ellipse(p.width / 2, p.height / 2, p.sin(p.frameCount * 0.05) * 100 + 100, p.sin(p.frameCount * 0.05) * 100 + 100);
-
-                    if (p.frameCount > 300) { // 5秒後にパズルを解決
-                        console.log('puzzle2.js: p5.js animation completed');
-                        puzzleManager.addSolvedTime(currentPuzzleIndex, audio.currentTime);
-                        p.noLoop();
-                    }
-                } catch (error) {
-                    console.error('puzzle2.js: p5.js draw: Failed during drawing', error);
-                }
-            };
-        };
-
-        new p5(sketch);
-        console.log('puzzle2.js: p5.js sketch initialized');
     } catch (error) {
         console.error('puzzle2.js: initPuzzle: Failed to initialize puzzle2', error);
     }
