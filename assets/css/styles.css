@@ -215,15 +215,15 @@ body::before {
 /* マーカーのスタイルを縦線に変更 */
 .marker {
     position: absolute;
-    top: -6px; /* マーカーを中央に配置 */
-    width: 2px; /* 縦線の幅 */
-    height: 16px; /* 縦線の高さ */
-    background: var(--marker-color, #ff0000); /* デフォルト色を赤に設定 */
-    border: 1px solid var(--marker-border-color, #ffffff); /* デフォルト枠色を白に設定 */
-    pointer-events: none; /* マーカーがクリックできないように */
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
+    top: -5px; /* プログレスバーの上に表示 */
+    width: 10px;
+    height: 10px;
+    background-color: var(--marker-color, #000);
+    border: 2px solid var(--marker-border-color, #fff);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    pointer-events: none; /* マーカーがクリックイベントを妨げないように */
 }
-
 /* =========================
    トラック情報
 ========================= */
@@ -346,3 +346,14 @@ body {
     overflow-y: hidden; /* 必要に応じて縦スクロールを無効化 */
 }
 
+/* クリアメッセージのスタイル */
+#clearMessage {
+    display: none; /* 初期状態では非表示 */
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    color: #FFD700; /* 金色 */
+    text-align: center;
+}

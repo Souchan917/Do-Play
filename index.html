@@ -1,3 +1,5 @@
+<!-- index.html -->
+
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -20,8 +22,9 @@
         <!-- 画像コンテナ -->
         <div class="cover-art-container">
             <div class="cover-art-wrapper">
-                <img src="assets/images/puzzles/stage1.jpg" alt="Current Puzzle" class="cover-art current" id="currentImage">
-                <img src="assets/images/puzzles/stage1_reveal.jpg" alt="Overlay" class="puzzle-overlay" id="puzzleOverlay">
+                <!-- 初期表示をステージ0に変更 -->
+                <img src="assets/images/puzzles/instructions.jpg" alt="Current Puzzle" class="cover-art current" id="currentImage">
+                <img src="assets/images/puzzles/instructions_reveal.jpg" alt="Overlay" class="puzzle-overlay" id="puzzleOverlay">
                 <!-- 次の画像は動的に変更 -->
                 <img src="" alt="Next Puzzle" class="cover-art next" id="nextImage">
             </div>
@@ -65,6 +68,9 @@
 
         <!-- 答え表示 -->
         <div class="answer-info" id="answerText">答え: 未表示</div>
+
+        <!-- クリアメッセージ -->
+        <div id="clearMessage" class="hidden"></div>
     </div>
 
     <!-- モジュールとしてmain.jsを読み込む -->

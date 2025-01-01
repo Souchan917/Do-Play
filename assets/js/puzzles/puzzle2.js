@@ -1,11 +1,5 @@
-/**
- * initPuzzle 関数
- * @param {HTMLAudioElement} audio - オーディオ要素
- * @param {HTMLElement} movablePart - 動かす部分の要素
- * @param {Array} puzzles - パズルデータの配列
- * @param {number} currentPuzzleIndex - 現在のパズルのインデックス
- * @param {PuzzleManager} puzzleManager - パズルマネージャーのインスタンス
- */
+// assets/js/puzzles/puzzle2.js
+
 export function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex, puzzleManager) {
     console.log('puzzle2.js: initPuzzle called');
 
@@ -15,32 +9,24 @@ export function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex, puzz
     }
 
     try {
-        // カウントアップタイマーを表示するための要素を作成
-        const timerDisplay = document.createElement('div');
-        timerDisplay.style.fontSize = '48px';
-        timerDisplay.style.color = '#00FF00'; // 緑色
-        timerDisplay.style.textAlign = 'center';
-        timerDisplay.textContent = '1';
-        movablePart.appendChild(timerDisplay);
-        console.log('puzzle2.js: Timer display element created');
+        // パズル2のロジックをここに実装
+        // 例: 特定のタイミングでボタンを表示し、クリックで解決
 
-        let count = 1;
-        const interval = setInterval(() => {
-            try {
-                count += 1;
-                timerDisplay.textContent = count;
-                console.log(`puzzle2.js: Timer updated to ${count}`);
+        const puzzleButton = document.createElement('button');
+        puzzleButton.textContent = 'パズル2を解く';
+        puzzleButton.style.position = 'absolute';
+        puzzleButton.style.top = '70%';
+        puzzleButton.style.left = '50%';
+        puzzleButton.style.transform = 'translate(-50%, -50%)';
+        puzzleButton.style.padding = '10px 20px';
+        puzzleButton.style.fontSize = '18px';
+        movablePart.appendChild(puzzleButton);
 
-                // 10秒後にパズルを解決
-                if (count > 10) {
-                    clearInterval(interval);
-                    console.log('puzzle2.js: Timer completed, solving puzzle');
-                    puzzleManager.addSolvedTime(currentPuzzleIndex, audio.currentTime);
-                }
-            } catch (error) {
-                console.error('puzzle2.js: Interval callback error:', error);
-            }
-        }, 1000); // 1秒ごとにカウントアップ
+        // ボタンのクリックイベントでパズルを解決
+        puzzleButton.addEventListener('click', () => {
+            puzzleManager.addSolvedTime(currentPuzzleIndex, audio.currentTime);
+            console.log('puzzle2.js: Puzzle2 solved');
+        });
 
     } catch (error) {
         console.error('puzzle2.js: initPuzzle: Failed to initialize puzzle2', error);

@@ -1,3 +1,5 @@
+// assets/js/main.js
+
 import { puzzles } from './data.js';
 import { AudioController } from './audioController.js';
 import { UIController } from './uiController.js';
@@ -114,19 +116,21 @@ async function preloadResources() {
         puzzles.forEach(puzzle => {
             // ベース画像とオーバーレイ画像のプリロード
             ['baseImage', 'overlayImage'].forEach(imageKey => {
-                const img = new Image();
-                img.src = puzzle[imageKey];
-                const promise = new Promise((resolve, reject) => {
-                    img.onload = () => {
-                        console.log(`main.js: Image loaded: ${puzzle[imageKey]}`);
-                        resolve();
-                    };
-                    img.onerror = () => {
-                        console.error(`main.js: Failed to load image: ${puzzle[imageKey]}`);
-                        reject(`Failed to load image: ${puzzle[imageKey]}`);
-                    };
-                });
-                imagePromises.push(promise);
+                if (puzzle[imageKey]) { // nullチェック
+                    const img = new Image();
+                    img.src = puzzle[imageKey];
+                    const promise = new Promise((resolve, reject) => {
+                        img.onload = () => {
+                            console.log(`main.js: Image loaded: ${puzzle[imageKey]}`);
+                            resolve();
+                        };
+                        img.onerror = () => {
+                            console.error(`main.js: Failed to load image: ${puzzle[imageKey]}`);
+                            reject(`Failed to load image: ${puzzle[imageKey]}`);
+                        };
+                    });
+                    imagePromises.push(promise);
+                }
             });
         });
 
@@ -297,3 +301,5 @@ function handleGesture() {
         console.error('main.js: handleGesture: Failed to handle swipe gesture', error);
     }
 }
+
+console.log('data.js loaded');

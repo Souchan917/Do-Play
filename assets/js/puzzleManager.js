@@ -1,9 +1,13 @@
+// assets/js/puzzleManager.js
+
+import { puzzles } from './data.js'; // ステージ0～9を含む
+
 export class PuzzleManager {
     constructor(puzzles, uiController, audioController, initialProgress) {
         this.puzzles = puzzles;
         this.ui = uiController;
         this.audio = audioController;
-        this.currentPuzzleIndex = initialProgress.currentPuzzleIndex || 0;
+        this.currentPuzzleIndex = initialProgress.currentPuzzleIndex || 0; // ステージ0から開始
         this.solvedPuzzles = initialProgress.solvedPuzzles || [];
         this.currentProgress = Math.max(...this.solvedPuzzles, this.currentPuzzleIndex) + 1;
         this.currentMovableScript = null;
@@ -23,7 +27,7 @@ export class PuzzleManager {
 
         // Movable partの表示・非表示を制御
         if (this.ui.movablePart) {
-            if (puzzle.id === 3) {  // パズル3の場合
+            if (puzzle.movableScript && puzzle.movableScript !== "puzzles/instructions.js" && puzzle.movableScript !== "puzzles/clear.js") {
                 this.ui.movablePart.style.display = 'block';
                 this.ui.movablePart.style.position = 'absolute';
                 this.ui.movablePart.style.width = '100%';
@@ -31,10 +35,10 @@ export class PuzzleManager {
                 this.ui.movablePart.style.top = '0';
                 this.ui.movablePart.style.left = '0';
                 this.ui.movablePart.style.zIndex = '2';
-                console.log('PuzzleManager: Movable part displayed for puzzle 3');
+                console.log(`PuzzleManager: Movable part displayed for puzzle ${puzzle.id}`);
             } else {
-                this.ui.movablePart.style.display = 'none';  // パズル3以外は非表示
-                console.log('PuzzleManager: Movable part hidden for non-puzzle 3');
+                this.ui.movablePart.style.display = 'none';  // 説明画面とクリア画面では非表示
+                console.log(`PuzzleManager: Movable part hidden for puzzle ${puzzle.id}`);
             }
         } else {
             console.error('PuzzleManager: loadPuzzle: movablePart element not found');
@@ -49,7 +53,7 @@ export class PuzzleManager {
         this.ui.updateImages(puzzle.baseImage);
         this.ui.updateOverlay("0");
 
-        // マーカーの更新: パズルが解決されている場合にのみ表示
+        // マーカーの更新
         this.ui.clearMarkers();
         if (this.solvedPuzzles.includes(puzzle.id)) {
             this.ui.addMarker(puzzle.markerPositionPercent, puzzle.markerColor);
@@ -58,8 +62,13 @@ export class PuzzleManager {
             console.log(`PuzzleManager: Puzzle ${puzzle.id} is not yet solved; no marker added`);
         }
 
-        // 動的スクリプトのロード
-        await this.loadMovableScript(puzzle);
+        // クリアステージの場合
+        if (puzzle.id === 9) {
+            this.ui.displayClearMessage();
+        } else {
+            // 動的スクリプトのロード
+            await this.loadMovableScript(puzzle);
+        }
     }
 
     /**
@@ -111,10 +120,6 @@ export class PuzzleManager {
                 this.solvedPuzzles.push(puzzle.id);
                 this.currentProgress = Math.max(this.currentProgress, index + 1);
 
-                // マーカーを追加
-                this.ui.addMarker(puzzle.markerPositionPercent, puzzle.markerColor);
-                console.log(`PuzzleManager: Puzzle ${puzzle.id} solved at time ${time} seconds`);
-
                 // 進捗更新コールバックの呼び出し
                 if (this.onProgressUpdate) {
                     this.onProgressUpdate(this.currentPuzzleIndex, this.solvedPuzzles);
@@ -137,6 +142,8 @@ export class PuzzleManager {
         try {
             if (this.currentPuzzleIndex < this.puzzles.length - 1) {
                 const nextIndex = this.currentPuzzleIndex + 1;
+
+                // 次のステージが解決済みであるか、またはまだ解決されていない場合の処理
                 if (nextIndex < this.currentProgress) {
                     this.currentPuzzleIndex = nextIndex;
                     console.log(`PuzzleManager: Proceeding to next puzzle at index ${nextIndex}`);
@@ -153,6 +160,11 @@ export class PuzzleManager {
                         this.currentPuzzleIndex = nextIndex;
                         console.log(`PuzzleManager: Proceeding to next puzzle at index ${nextIndex} after solving`);
                         this.loadPuzzle(this.currentPuzzleIndex, 'left');
+                    } else if (this.solvedPuzzles.includes(currentPuz.id)) {
+                        // 既に解決済みの場合は自由に移動
+                        this.currentPuzzleIndex = nextIndex;
+                        this.loadPuzzle(this.currentPuzzleIndex, 'left');
+                        console.log(`PuzzleManager: Proceeding to next puzzle at index ${nextIndex} (already solved)`);
                     } else {
                         // 振動アニメーション
                         this.ui.triggerShakeAnimation(this.ui.nextBtn);
@@ -173,7 +185,8 @@ export class PuzzleManager {
         try {
             if (this.currentPuzzleIndex > 0) {
                 const prevIndex = this.currentPuzzleIndex - 1;
-                if (prevIndex < this.currentProgress) {
+
+                if (this.solvedPuzzles.includes(this.puzzles[prevIndex].id) || prevIndex < this.currentProgress) {
                     this.currentPuzzleIndex = prevIndex;
                     console.log(`PuzzleManager: Going back to previous puzzle at index ${prevIndex}`);
                     this.loadPuzzle(this.currentPuzzleIndex, 'right');

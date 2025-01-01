@@ -1,3 +1,5 @@
+// assets/js/uiController.js
+
 import { formatTime, triggerShake, adjustColor } from './utils.js';
 
 export class UIController {
@@ -19,6 +21,7 @@ export class UIController {
         this.nextBtn = domElements.nextBtn;
         this.answerText = domElements.answerText;
         this.movablePart = domElements.movablePart;
+        this.clearMessage = document.getElementById('clearMessage'); // クリアメッセージ用要素を取得
     }
 
     updatePlayButton(isPlaying) {
@@ -100,7 +103,7 @@ export class UIController {
 
     displayAnswer(answer) {
         try {
-            this.answerText.textContent = `答え: ${answer}`;
+            this.answerText.textContent = answer ? `答え: ${answer}` : "答え: 未表示";
             console.log(`UIController: Answer displayed: ${answer}`);
         } catch (error) {
             console.error('UIController:displayAnswer: Failed to display answer', error);
@@ -119,25 +122,13 @@ export class UIController {
                 return;
             }
 
-            // 既存のマーカーをすべてクリア
-            this.clearMarkers();
-
-            // マーカーが既に存在するか確認（念のため）
-            const existingMarkers = this.progressBg.querySelectorAll('.marker');
-            for (let marker of existingMarkers) {
-                if (parseFloat(marker.style.left) === markerPercent) {
-                    console.log(`UIController:addMarker: Marker already exists at ${markerPercent}%`);
-                    return;
-                }
-            }
-
             const marker = document.createElement('div');
             marker.classList.add('marker');
             marker.style.left = `${markerPercent}%`;
 
             // マーカーの色を設定
-            marker.style.setProperty('--marker-color', color);
-            marker.style.setProperty('--marker-border-color', adjustColor(color, 0.2));
+            marker.style.backgroundColor = color;
+            marker.style.borderColor = adjustColor(color, 0.2);
 
             this.progressBg.appendChild(marker);
             console.log(`UIController:addMarker: Marker added at ${markerPercent}% with color ${color}`);
@@ -166,19 +157,30 @@ export class UIController {
     }
 
     /**
-     * マーカーの色を調整する関数
-     * @param {string} color - HEX形式の色コード
-     * @param {number} factor - 明度調整の係数
-     * @returns {string} - 調整後のHEX色コード
+     * クリアメッセージを表示する関数
      */
-    adjustMarkerColor(color, factor) {
+    displayClearMessage() {
         try {
-            const adjustedColor = adjustColor(color, factor);
-            console.log(`UIController: Marker color adjusted from ${color} to ${adjustedColor}`);
-            return adjustedColor;
+            if (!this.clearMessage) {
+                // clearMessage要素が存在しない場合は作成
+                this.clearMessage = document.createElement('div');
+                this.clearMessage.id = 'clearMessage';
+                this.clearMessage.style.position = 'absolute';
+                this.clearMessage.style.top = '50%';
+                this.clearMessage.style.left = '50%';
+                this.clearMessage.style.transform = 'translate(-50%, -50%)';
+                this.clearMessage.style.fontSize = '48px';
+                this.clearMessage.style.color = '#FFD700'; // 金色
+                this.clearMessage.style.textAlign = 'center';
+                this.clearMessage.textContent = 'クリアおめでとうございます！';
+                this.playerContainer.appendChild(this.clearMessage);
+                console.log('UIController: Clear message element created and displayed');
+            } else {
+                this.clearMessage.style.display = 'block';
+                console.log('UIController: Clear message displayed');
+            }
         } catch (error) {
-            console.error('UIController:adjustMarkerColor: Failed to adjust marker color', error);
-            return color; // 失敗した場合は元の色を返す
+            console.error('UIController:displayClearMessage: Failed to display clear message', error);
         }
     }
 }
