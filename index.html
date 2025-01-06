@@ -1,5 +1,3 @@
-<!-- index.html -->
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -7,11 +5,16 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>パズルゲーム</title>
     <link rel="stylesheet" href="assets/css/styles.css">
-    <!-- p5.js のCDNを追加 -->
-    <!-- p5.js CDN -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.2/p5.min.js" integrity="sha512-/o7p4Vb+miE6Fd8FYNi24XbUgG9xIocEkWazlNi0LPXEJpR2+W20J+r/ilWcRdaUwsBjOcwfsfV1UBiCF/EOQg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
     
+    <!-- p5.js CDNの読み込み -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.4.4/p5.js"></script>
+
+    <!-- モジュールとしてmain.jsを読み込む -->
+    <script type="module" src="assets/js/main.js"></script>
+
+    <!-- ファビコンの設定 -->
+    <link rel="icon" href="assets/images/favicon.ico">
+
 </head>
 <body>
     <!-- ロード画面 -->
@@ -75,8 +78,5 @@
         <!-- クリアメッセージ -->
         <div id="clearMessage" class="hidden"></div>
     </div>
-
-    <!-- モジュールとしてmain.jsを読み込む -->
-    <script type="module" src="assets/js/main.js"></script>
 </body>
 </html>
