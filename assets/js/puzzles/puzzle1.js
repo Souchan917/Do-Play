@@ -1,11 +1,5 @@
-/**
- * initPuzzle 関数
- * @param {HTMLAudioElement} audio - オーディオ要素
- * @param {HTMLElement} movablePart - 動かす部分の要素
- * @param {Array} puzzles - パズルデータの配列
- * @param {number} currentPuzzleIndex - 現在のパズルのインデックス
- * @param {PuzzleManager} puzzleManager - パズルマネージャーのインスタンス
- */
+// assets/js/puzzle1.js
+
 export function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex, puzzleManager) {
     console.log('puzzle1.js: initPuzzle called');
 
@@ -15,7 +9,48 @@ export function initPuzzle(audio, movablePart, puzzles, currentPuzzleIndex, puzz
     }
 
     try {
-        // カウントアップタイマーを表示するための要素を作成
+        // movablePartのサイズ設定
+        movablePart.style.width = '100%';
+        movablePart.style.height = '100vh'; // ビューポートの高さに合わせる
+
+        // p5.js スケッチの初期化
+        const sketch = (p) => {
+            let xPos = 0;
+            let yPos = 0;
+
+            p.setup = () => {
+                p.createCanvas(p.windowWidth, p.windowHeight);
+                p.background('#8B0000'); // 背景を濃い赤に設定
+            };
+
+            p.draw = () => {
+                p.background('#8B0000'); // 背景は赤色
+                p.stroke(255);  // 白い線
+                p.strokeWeight(2);
+                p.noFill();
+
+                // 動く白い線を描画
+                p.beginShape();
+                for (let i = 0; i < p.width; i += 10) {
+                    let y = p.sin(i * 0.05 + p.frameCount * 0.1) * 100 + p.height / 2;
+                    p.vertex(i, y);
+                }
+                p.endShape();
+
+                // 線を移動させる
+                xPos += 2;
+                if (xPos > p.width) {
+                    xPos = 0;
+                }
+            };
+        };
+
+        // p5.js スケッチを movablePart に描画
+        new p5(sketch, movablePart);
+
+        console.log('puzzle1.js: p5.js canvas initialized');
+
+        // タイマー表示（元のコード）
         const timerDisplay = document.createElement('div');
         timerDisplay.style.fontSize = '48px';
         timerDisplay.style.color = '#00FF00'; // 緑色
