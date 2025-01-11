@@ -32,7 +32,7 @@ const uiController = new UIController(domElements);
 
 // オーディオコントローラーの初期化
 const audioController = new AudioController(
-    'assets/audio/Unlimited Power.mp3',
+    'assets/audio/Try again.mp3',
     (currentTime, duration) => {
         uiController.updateProgressBar(currentTime, duration);
         if (puzzleManager) {
